@@ -1,0 +1,19 @@
+{
+  "name": "nodeserver-dinos",
+  "version": "0.0.1",
+  "description": "Sample node server with dinosaurs!",
+  "repository": "https://github.com/kmaida/sample-nodeserver-dinos",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Kim Maida",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "express": "^4.15.2",
+    "express-jwt": "^5.1.0",
+    "jwks-rsa": "^1.1.1"
+  }
+}
