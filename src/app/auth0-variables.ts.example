@@ -7,8 +7,8 @@ interface AuthConfig {
 }
 
 export const AUTH_CONFIG: AuthConfig = {
-  CLIENT_ID: '{CLIENT_ID}',
-  CLIENT_DOMAIN: '{DOMAIN}',
+  CLIENT_ID: '[CLIENT_ID]',
+  CLIENT_DOMAIN: '[CLIENT_DOMAIN].auth0.com',
   AUDIENCE: 'http://localhost:3001/api/',
   REDIRECT: 'http://localhost:4200/callback',
   SCOPE: 'openid profile'

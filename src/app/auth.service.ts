@@ -55,7 +55,7 @@ export class AuthService {
   private _getProfile(authResult) {
     this.auth0.client.userInfo(authResult.accessToken, (err, profile) => {
       this._setSession(authResult, profile);
-      console.info(`User profile: ${profile}`);
+      console.info(profile);
     });
   }
 

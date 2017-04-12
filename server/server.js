@@ -13,7 +13,6 @@ var dragonsJson = require('./dragons.json');
 //-- JWT check
 
 var CLIENT_DOMAIN = '[YOUR-DOMAIN].auth0.com';
-
 var jwtCheck = jwt({
     secret: jwks.expressJwtSecret({
       cache: true,
