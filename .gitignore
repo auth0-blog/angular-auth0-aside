@@ -3,6 +3,7 @@
 /node_modules
 /server/node_modules
 auth0-variables.ts
+auth-variables.js
 
 # compiled output
 /dist

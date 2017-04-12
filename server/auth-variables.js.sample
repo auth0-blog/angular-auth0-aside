@@ -1,0 +1,3 @@
+var AUTH = {
+  CLIENT_DOMAIN: 'kmaida.auth0.com'
+}

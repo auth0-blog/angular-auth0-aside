@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Drogon",
+    "source": "A Song of Ice and Fire"
+  },
+	{
+    "id": 2,
+    "name": "Viserion",
+    "source": "A Song of Ice and Fire"
+	},
+  {
+    "id": 3,
+    "name": "Rhaegal",
+    "source": "A Song of Ice and Fire"
+	},
+  {
+    "id": 4,
+    "name": "Falkor",
+    "source": "The Neverending Story"
+	},
+  {
+    "id": 5,
+    "name": "Smaug",
+    "source": "The Hobbit"
+	},
+  {
+    "id": 6,
+    "name": "Puff",
+    "source": "Peter, Paul and Mary"
+	}
+]
