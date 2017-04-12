@@ -1,7 +1,6 @@
 'use strict';
 
 //-- Require
-
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -11,8 +10,9 @@ var jwks = require('jwks-rsa');
 var dragonsJson = require('./dragons.json');
 
 //-- JWT check
-
+// @TODO: change [CLIENT_DOMAIN] to your Auth0 domain name.
 var CLIENT_DOMAIN = '[CLIENT_DOMAIN].auth0.com';
+
 var jwtCheck = jwt({
     secret: jwks.expressJwtSecret({
       cache: true,
@@ -26,18 +26,15 @@ var jwtCheck = jwt({
 });
 
 //--- Set up app
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-//--- Get route
-
+//--- GET protected dragons route
 app.get('/api/dragons', jwtCheck, function (req, res) {
   res.json(dragonsJson);
 });
 
 //--- Port
-
 app.listen(3001);
 console.log('Listening on localhost:3001');

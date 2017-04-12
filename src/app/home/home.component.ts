@@ -16,8 +16,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private api: ApiService, public auth: AuthService) { }
 
   ngOnInit() {
-    this.authSubscription = this.auth.loggedIn$.subscribe(auth => {
-      if (auth) {
+    // Subscribe to login status subject
+    // If authenticated, subscribe to dragons data observable
+    // If not authenticated, unsubscribe from dragons data 
+    this.authSubscription = this.auth.loggedIn$.subscribe(loggedIn => {
+      if (loggedIn) {
         this._getDragons();
       } else {
         this.dragons = null;
@@ -27,11 +30,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Unsubscribe from observables
     this.authSubscription.unsubscribe();
     this._destroyDragonsSubscription();
   }
 
   private _getDragons() {
+    // Subscribe to dragons API observable
     this.dragonsSubscription = this.api.getDragons$().subscribe(
       data => {
         this.dragons = data;
@@ -42,6 +47,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private _destroyDragonsSubscription() {
+    // If a dragons subscription exists, unsubscribe
     if (this.dragonsSubscription) {
       this.dragonsSubscription.unsubscribe();
     }

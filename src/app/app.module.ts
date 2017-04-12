@@ -3,8 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, Http, RequestOptions } from '@angular/http';
 import { AppRoutingModule } from './app-routing.module';
-
 import { ApiService } from './api.service';
+
 import { AuthService } from './auth/auth.service';
 import { AuthHttp } from 'angular2-jwt';
 import { authHttpFactory } from './auth/auth-http.factory';
