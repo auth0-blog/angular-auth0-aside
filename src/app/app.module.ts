@@ -11,11 +11,13 @@ import { authHttpFactory } from './auth-http.factory';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
+import { CallbackComponent } from './callback/callback.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    CallbackComponent
   ],
   imports: [
     BrowserModule,

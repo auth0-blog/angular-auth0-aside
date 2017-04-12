@@ -5,4 +5,10 @@
 <div *ngIf="auth.authenticated">
   <p>Hello, {{auth.userProfile.name}}!</p>
   <button (click)="auth.logout()">Log Out</button>
+
+  <ul>
+    <li *ngFor="let dragon of dragons">
+      {{dragon.name}} - {{dragon.source}}
+    </li>
+  </ul>
 </div>

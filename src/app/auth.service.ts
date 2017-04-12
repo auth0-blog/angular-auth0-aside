@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AUTH_CONFIG } from './auth0-variables';
 import { tokenNotExpired } from 'angular2-jwt';
 
 // Avoid name not found warnings
 declare var auth0: any;
-declare var localStorage: any;
 
 @Injectable()
 export class AuthService {
@@ -13,10 +13,20 @@ export class AuthService {
     clientID: AUTH_CONFIG.CLIENT_ID,
     domain: AUTH_CONFIG.CLIENT_DOMAIN
   });
-  userProfile: any;
+  userProfile: Object;
+  loggedIn: boolean;
+  loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
 
   constructor(private router: Router) {
-    this.userProfile = JSON.parse(localStorage.getItem('profile'));
+    if (this.authenticated) {
+      this.userProfile = JSON.parse(localStorage.getItem('profile'));
+      this.setLoggedIn(true);
+    }
+  }
+
+  setLoggedIn(value: boolean) {
+    this.loggedIn$.next(value);
+    this.loggedIn = value;
   }
 
   login() {
@@ -45,15 +55,17 @@ export class AuthService {
   private _getProfile(authResult) {
     this.auth0.client.userInfo(authResult.accessToken, (err, profile) => {
       this._setSession(authResult, profile);
-      console.log(profile);
+      console.info(`User profile: ${profile}`);
     });
   }
 
   private _setSession(authResult, profile) {
+    // Save session data and update login subject
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('profile', JSON.stringify(profile));
     this.userProfile = profile;
+    this.setLoggedIn(true);
   }
 
   logout() {
@@ -62,6 +74,7 @@ export class AuthService {
     localStorage.removeItem('id_token');
     localStorage.removeItem('profile');
     this.userProfile = undefined;
+    this.setLoggedIn(false);
   }
 
   get authenticated() {

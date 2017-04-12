@@ -10,6 +10,6 @@ export const AUTH_CONFIG: AuthConfig = {
   CLIENT_ID: '{CLIENT_ID}',
   CLIENT_DOMAIN: '{DOMAIN}',
   AUDIENCE: 'http://localhost:3001/api/',
-  REDIRECT: 'http://localhost:4200',
+  REDIRECT: 'http://localhost:4200/callback',
   SCOPE: 'openid profile'
 };

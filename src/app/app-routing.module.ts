@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { HomeComponent } from './home/home.component';
+import { CallbackComponent } from './callback/callback.component';
 
 @NgModule({
   imports: [
@@ -9,6 +10,10 @@ import { HomeComponent } from './home/home.component';
       {
         path: '',
         component: HomeComponent
+      },
+      {
+        path: 'callback',
+        component: CallbackComponent
       },
       {
         path: '**',

@@ -26,13 +26,19 @@ var jwtCheck = jwt({
     algorithms: ['RS256']
 });
 
+//--- Set up app
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+//--- Get route
+
 app.get('/api/dragons', jwtCheck, function (req, res) {
   res.json(dragonsJson);
 });
+
+//--- Port
 
 app.listen(3001);
 console.log('Listening on localhost:3001');
