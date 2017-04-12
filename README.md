@@ -17,8 +17,8 @@ $ cd server
 $ npm install
 ```
 
-1. Open `server/server.js` and replace `[YOUR-DOMAIN].auth0.com` with your Auth0 domain.
-2. Open `src/app/auth0-variables.ts.example` and remove `.example` from the file name. Then replace `[CLIENT_ID]` and `[CLIENT_DOMAIN]` with your Auth0 client ID and domain.
+1. Open `server/server.js` and replace `[CLIENT_DOMAIN].auth0.com` with your Auth0 domain.
+2. Open `src/app/auth/auth0-variables.ts.example` and remove `.example` from the file name. Then replace `[CLIENT_ID]` and `[CLIENT_DOMAIN]` with your Auth0 client ID and domain.
 
 ## Serving the project
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { ApiService } from './../api.service';
-import { AuthService } from './../auth.service';
+import { AuthService } from './../auth/auth.service';
 
 @Component({
   selector: 'app-home',

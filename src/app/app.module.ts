@@ -5,9 +5,9 @@ import { HttpModule, Http, RequestOptions } from '@angular/http';
 import { AppRoutingModule } from './app-routing.module';
 
 import { ApiService } from './api.service';
-import { AuthService } from './auth.service';
+import { AuthService } from './auth/auth.service';
 import { AuthHttp } from 'angular2-jwt';
-import { authHttpFactory } from './auth-http.factory';
+import { authHttpFactory } from './auth/auth-http.factory';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
