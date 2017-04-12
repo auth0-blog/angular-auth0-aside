@@ -9,9 +9,9 @@ import 'rxjs/add/operator/catch';
 export class ApiService {
   private baseUrl = 'http://localhost:3001/api/';
 
-  constructor(private http: Http, private authHttp: AuthHttp, private options: RequestOptions) { }
+  constructor(private authHttp: AuthHttp, private options: RequestOptions) { }
 
-  getDragons$(): Observable<string> {
+  getDragons$(): Observable<any[]> {
     return this.authHttp
       .get(`${this.baseUrl}dragons`)
       .map(this._handleSuccess)
