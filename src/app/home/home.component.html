@@ -1,3 +1,8 @@
-<p>
-  <a href="{{auth.authUrl}}">Log In</a>
-</p>
+<div *ngIf="!auth.authenticated">
+  <a (click)="auth.login()">Log In</a>
+</div>
+
+<div *ngIf="auth.authenticated">
+  <p>Hello, {{auth.userProfile.name}}!</p>
+  <a (click)="auth.logout()">Log Out</a>
+</div>

@@ -1,31 +1,64 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { AUTH_CONFIG } from './auth0-variables';
 import { tokenNotExpired } from 'angular2-jwt';
 
 // Avoid name not found warnings
+declare var auth0: any;
 declare var localStorage: any;
-declare var window: any;
 
 @Injectable()
 export class AuthService {
-  CLIENT_DOMAIN = 'kmaida.auth0.com';
-  CLIENT_ID = 'Rp1ZbPH6fK93lynaOt6HyQa3KcvN7Xl8&';
-  AUDIENCE = 'http://localhost:3001/api/';
-  REDIRECT_URI = 'http://localhost:4200';
-  NONCE: string = this._randomString(16);
-
-  authUrl = `https://${this.CLIENT_DOMAIN}/authorize?audience=${this.AUDIENCE}&
-response_type=id_token%20token&client_id=${this.CLIENT_ID}&redirect_uri=${this.REDIRECT_URI}&nonce=${this.NONCE}`;
-
+  auth0 = new auth0.WebAuth({
+    clientID: AUTH_CONFIG.CLIENT_ID,
+    domain: AUTH_CONFIG.CLIENT_DOMAIN
+  });
   userProfile: Object;
-  loginRedirect: string;
 
   constructor(private router: Router) {
     this.userProfile = JSON.parse(localStorage.getItem('profile'));
   }
 
+  login() {
+    // Nonce is automatically generated: https://auth0.com/docs/libraries/auth0js/v8#using-nonce
+    this.auth0.authorize({
+      responseType: 'token id_token',
+      redirectUri: AUTH_CONFIG.REDIRECT,
+      audience: AUTH_CONFIG.AUDIENCE,
+      scope: AUTH_CONFIG.SCOPE
+    });
+  }
+
+  handleAuth() {
+    this.auth0.parseHash((err, authResult) => {
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        window.location.hash = '';
+        this._getProfile(authResult);
+        this.router.navigate(['/']);
+      } else if (err) {
+        this.router.navigate(['/']);
+        console.error(`Error: ${err.error}`);
+      }
+    });
+  }
+
+  private _getProfile(authResult) {
+    this.auth0.client.userInfo(authResult.accessToken, (err, profile) => {
+      this._setSession(authResult, profile);
+      console.log(profile);
+    });
+  }
+
+  private _setSession(authResult, profile) {
+    localStorage.setItem('access_token', authResult.accessToken);
+    localStorage.setItem('id_token', authResult.idToken);
+    localStorage.setItem('profile', JSON.stringify(profile));
+    this.userProfile = profile;
+  }
+
   logout() {
-    // Remove token and profile
+    // Remove tokens and profile
+    localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('profile');
     this.userProfile = undefined;
@@ -34,18 +67,6 @@ response_type=id_token%20token&client_id=${this.CLIENT_ID}&redirect_uri=${this.R
   get authenticated() {
     // Check if there's an unexpired access token
     return tokenNotExpired();
-  }
-
-  private _randomString(length) {
-    var bytes = new Uint8Array(length);
-    var random = window.crypto.getRandomValues(bytes);
-    var result = [];
-    var charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._~';
-
-    random.forEach(function(c) {
-        result.push(charset[c % charset.length]);
-    });
-    return result.join('');
   }
 
 }
