@@ -6,7 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
-import { AUTH_PROVIDERS, AuthHttp } from 'angular2-jwt';
+import { AuthHttp } from 'angular2-jwt';
 import { authHttpFactory } from './auth-http.factory';
 
 import { AppComponent } from './app.component';
@@ -28,7 +28,6 @@ import { CallbackComponent } from './callback/callback.component';
   providers: [
     ApiService,
     AuthService,
-    AUTH_PROVIDERS,
     {
       provide: AuthHttp,
       useFactory: authHttpFactory,
