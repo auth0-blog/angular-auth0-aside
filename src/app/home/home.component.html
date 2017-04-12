@@ -1,8 +1,8 @@
 <div *ngIf="!auth.authenticated">
-  <a (click)="auth.login()">Log In</a>
+  <button (click)="auth.login()">Log In</button>
 </div>
 
 <div *ngIf="auth.authenticated">
   <p>Hello, {{auth.userProfile.name}}!</p>
-  <a (click)="auth.logout()">Log Out</a>
+  <button (click)="auth.logout()">Log Out</button>
 </div>

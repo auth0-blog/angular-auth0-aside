@@ -9,7 +9,7 @@ interface AuthConfig {
 export const AUTH_CONFIG: AuthConfig = {
   CLIENT_ID: '{CLIENT_ID}',
   CLIENT_DOMAIN: '{DOMAIN}',
-  AUDIENCE: '{AUDIENCE}',
-  REDIRECT: '{REDIRECT_URI}',
+  AUDIENCE: 'http://localhost:3001/api/',
+  REDIRECT: 'http://localhost:4200',
   SCOPE: 'openid profile'
 };

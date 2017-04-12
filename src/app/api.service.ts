@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http, RequestOptions, Response } from '@angular/http';
+import { AuthHttp, AuthConfig } from 'angular2-jwt';
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -8,18 +9,17 @@ import 'rxjs/add/operator/catch';
 export class ApiService {
   private baseUrl = 'http://localhost:3001/api/';
 
-  constructor(private http: Http) { }
+  constructor(private http: Http, private authHttp: AuthHttp, private options: RequestOptions) { }
 
-  getData$(): Observable<string> {
-    return this.http
-      .get(`${this.baseUrl}`)
+  getDragons$(): Observable<string> {
+    return this.authHttp
+      .get(`${this.baseUrl}dragons`)
       .map(this._handleSuccess)
       .catch(this._handleError);
   }
 
   private _handleSuccess(res: Response) {
-    //return res.json();
-    return res;
+    return res.json();
   }
 
   private _handleError(err: Response | any) {

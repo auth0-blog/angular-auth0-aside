@@ -13,7 +13,7 @@ export class AuthService {
     clientID: AUTH_CONFIG.CLIENT_ID,
     domain: AUTH_CONFIG.CLIENT_DOMAIN
   });
-  userProfile: Object;
+  userProfile: any;
 
   constructor(private router: Router) {
     this.userProfile = JSON.parse(localStorage.getItem('profile'));
@@ -66,7 +66,7 @@ export class AuthService {
 
   get authenticated() {
     // Check if there's an unexpired access token
-    return tokenNotExpired();
+    return tokenNotExpired('access_token');
   }
 
 }
