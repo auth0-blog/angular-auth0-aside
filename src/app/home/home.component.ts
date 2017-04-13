@@ -53,4 +53,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
+  get dragonsExist() {
+    return !!this.dragons && this.dragons.length;
+  }
+
 }

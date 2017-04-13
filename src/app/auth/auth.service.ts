@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AUTH_CONFIG } from './auth0-variables';
 import { tokenNotExpired } from 'angular2-jwt';
+import { UserProfile } from './profile.model';
 
 // Avoid name not found warnings
 declare var auth0: any;
@@ -16,7 +17,7 @@ export class AuthService {
     domain: AUTH_CONFIG.CLIENT_DOMAIN
   });
 
-  userProfile: Object;
+  userProfile: UserProfile;
 
   // Create a stream of logged in status to communicate throughout app
   loggedIn: boolean;
@@ -65,7 +66,6 @@ export class AuthService {
     // Use access token to retrieve user's profile and set session
     this.auth0.client.userInfo(authResult.accessToken, (err, profile) => {
       this._setSession(authResult, profile);
-      console.info(profile);
     });
   }
 
