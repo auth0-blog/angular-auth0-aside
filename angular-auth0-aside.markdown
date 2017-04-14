@@ -62,14 +62,18 @@ Open the [`server.js` file](https://github.com/auth0-blog/angular-auth0-aside/bl
 // server/server.js
 ...
 // @TODO: change [CLIENT_DOMAIN] to your Auth0 domain name.
+// @TODO: change [AUTH0_API_AUDIENCE] to your Auth0 API audience.
 var CLIENT_DOMAIN = '[CLIENT_DOMAIN].auth0.com';
+var AUTH0_AUDIENCE = '[AUTH0_API_AUDIENCE]';  // http://localhost:3001/api in this example
 
 var jwtCheck = jwt({
     secret: jwks.expressJwtSecret({
-      ...,
+      cache: true,
+      rateLimit: true,
+      jwksRequestsPerMinute: 5,
       jwksUri: `https://${CLIENT_DOMAIN}/.well-known/jwks.json`
     }),
-    audience: 'http://localhost:3001/api/',
+    audience: AUTH0_AUDIENCE,
     issuer: `https://${CLIENT_DOMAIN}/`,
     algorithms: ['RS256']
 });
@@ -102,44 +106,136 @@ With the Node API and Angular app running, let's take a look at how authenticati
 
 ### Authentication Service
 
-Authentication logic on the front end is handled with an `AuthService` authentication service: [`src/app/auth/auth.service.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth.service.ts). This service uses the config variables from `auth0-variables.ts` to instantiate an `auth0.js` WebAuth instance.
-
-> **Note:** `auth0.js` is linked in the `index.html` file from CDN.
+Authentication logic on the front end is handled with an `AuthService` authentication service: [`src/app/auth/auth.service.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth.service.ts). 
 
 ```js
-// src/app/auth/auth.service.ts
-...
-auth0 = new auth0.WebAuth({
-  clientID: AUTH_CONFIG.CLIENT_ID,
-  domain: AUTH_CONFIG.CLIENT_DOMAIN
-});
-...
-```
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { AUTH_CONFIG } from './auth0-variables';
+import { tokenNotExpired } from 'angular2-jwt';
+import { UserProfile } from './profile.model';
 
-An [RxJS `BehaviorSubject`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/subjects/behaviorsubject.md) is used to provide a stream of authentication status events that you can subscribe to anywhere in the app.
+// Avoid name not found warnings
+declare var auth0: any;
 
-```js
-// src/app/auth/auth.service.ts
-...
+@Injectable()
+export class AuthService {
+  // Create Auth0 web auth instance
+  // @TODO: Update AUTH_CONFIG and remove .example extension in src/app/auth/auth0-variables.ts.example
+  auth0 = new auth0.WebAuth({
+    clientID: AUTH_CONFIG.CLIENT_ID,
+    domain: AUTH_CONFIG.CLIENT_DOMAIN
+  });
+
+  userProfile: UserProfile;
+
   // Create a stream of logged in status to communicate throughout app
   loggedIn: boolean;
   loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
-...
+
+  constructor(private router: Router) {
+    // If authenticated, set local profile property and update login status subject
+    if (this.authenticated) {
+      this.userProfile = JSON.parse(localStorage.getItem('profile'));
+      this.setLoggedIn(true);
+    }
+  }
+
   setLoggedIn(value: boolean) {
     // Update login status subject
     this.loggedIn$.next(value);
     this.loggedIn = value;
   }
-...
+
+  login() {
+    // Auth0 authorize request
+    // Note: nonce is automatically generated: https://auth0.com/docs/libraries/auth0js/v8#using-nonce
+    this.auth0.authorize({
+      responseType: 'token id_token',
+      redirectUri: AUTH_CONFIG.REDIRECT,
+      audience: AUTH_CONFIG.AUDIENCE,
+      scope: AUTH_CONFIG.SCOPE
+    });
+  }
+
+  handleAuth() {
+    // When Auth0 hash parsed, get profile
+    this.auth0.parseHash((err, authResult) => {
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        window.location.hash = '';
+        this._getProfile(authResult);
+        this.router.navigate(['/']);
+      } else if (err) {
+        this.router.navigate(['/']);
+        console.error(`Error: ${err.error}`);
+      }
+    });
+  }
+
+  private _getProfile(authResult) {
+    // Use access token to retrieve user's profile and set session
+    this.auth0.client.userInfo(authResult.accessToken, (err, profile) => {
+      this._setSession(authResult, profile);
+    });
+  }
+
+  private _setSession(authResult, profile) {
+    // Save session data and update login status subject
+    localStorage.setItem('access_token', authResult.accessToken);
+    localStorage.setItem('id_token', authResult.idToken);
+    localStorage.setItem('profile', JSON.stringify(profile));
+    this.userProfile = profile;
+    this.setLoggedIn(true);
+  }
+
+  logout() {
+    // Remove tokens and profile and update login status subject
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('id_token');
+    localStorage.removeItem('profile');
+    this.userProfile = undefined;
+    this.setLoggedIn(false);
+  }
+
+  get authenticated() {
+    // Check if there's an unexpired access token
+    return tokenNotExpired('access_token');
+  }
+
+}
 ```
 
-The `login()` method authorizes the authentication request with Auth0 using your config variables. An Auth0 hosted Lock instance will be shown to the user and they can then log in. If it's their first visit to our app, they'll also be presented with a consent screen where they can grant access to our API.
+This service uses the config variables from `auth0-variables.ts` to instantiate an `auth0.js` WebAuth instance.
 
-We'll receive an `id_token` and an `access_token` in the hash from Auth0 when returning to our app. The `parseHash()` method callback is then used to get the user's profile (`client.userInfo()`) and set the session by saving the tokens and profile to local storage and updating the `loggedIn$` subject so that any subscribed components in the app are informed that the user is now authenticated. Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject and an `authenticated()` accessor to return current authentication status.
+> **Note:** `auth0.js` is linked in the `index.html` file from CDN.
+
+An [RxJS `BehaviorSubject`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/subjects/behaviorsubject.md) is used to provide a stream of authentication status events that you can subscribe to anywhere in the app.
+
+The `login()` method authorizes the authentication request with Auth0 using your config variables. An Auth0 hosted Lock instance will be shown to the user and they can then log in:
+
+> **Note:** If it's the user's first visit to our app _and_ our callback is on `localhost`, they'll also be presented with a consent screen where they can grant access to our API. First party clients on non-localhost domains will not be presented with the consent dialog.
+
+We'll receive an `id_token` and an `access_token` in the hash from Auth0 when returning to our app. The `handleAuth()` method uses Auth0's `parseHash()` method callback to get the user's profile (`_getProfile()`) and set the session (`_setSession()`) by saving the tokens and profile to local storage and updating the `loggedIn$` subject so that any subscribed components in the app are informed that the user is now authenticated.
 
 > **Note:** The profile takes the shape of [`profile.model.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/profile.model.ts) from the [OpenID standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims).
 
-Once `AuthService` is provided in `app.module.ts`, its methods and properties can be used anywhere in our app, such as the [home component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/home).
+The `handleAuth()` method can then be called in the [`app.component.ts` constructor](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.component.ts) like so:
+
+```js
+// src/app/app.component.ts
+import { AuthService } from './auth/auth.service';
+...
+  constructor(private auth: AuthService) {
+    // Check for authentication and handle if hash present
+    auth.handleAuth();
+  }
+...
+```
+
+Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject and an `authenticated()` accessor to return current authentication status.
+
+Once [`AuthService` is provided in `app.module.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts#L32), its methods and properties can be used anywhere in our app, such as the [home component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/home).
 
 The [callback component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/callback) is where the app is redirected after authentication. This component simply shows a loading message until hash parsing is completed and the Angular app redirects back to the home page. 
 
