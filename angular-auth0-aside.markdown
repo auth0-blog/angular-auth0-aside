@@ -98,3 +98,80 @@ Our app is now set up. Let's take a look at how authentication is implemented.
 
 ### Authentication Service
 
+Authentication logic on the front end is handled with an `AuthService` authentication service: [`src/app/auth/auth.service.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth.service.ts). This service uses the config variables from `auth0-variables.ts` to instantiate an `auth0.js` WebAuth instance.
+
+> **Note:** `auth0.js` is linked in the `index.html` file from CDN.
+
+```js
+// src/app/auth/auth.service.ts
+...
+auth0 = new auth0.WebAuth({
+  clientID: AUTH_CONFIG.CLIENT_ID,
+  domain: AUTH_CONFIG.CLIENT_DOMAIN
+});
+...
+```
+
+An [RxJS `BehaviorSubject`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/subjects/behaviorsubject.md) is used to provide a stream of authentication status events that you can subscribe to anywhere in the app.
+
+```js
+// src/app/auth/auth.service.ts
+...
+  // Create a stream of logged in status to communicate throughout app
+  loggedIn: boolean;
+  loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
+...
+  setLoggedIn(value: boolean) {
+    // Update login status subject
+    this.loggedIn$.next(value);
+    this.loggedIn = value;
+  }
+...
+```
+
+The `login()` method authorizes the authentication request with Auth0 using your config variables. An Auth0 hosted Lock instance will be shown to the user and they can then log in. If it's their first visit to our app, they'll also be presented with a consent screen where they can grant access to our API.
+
+We'll receive an `id_token` and an `access_token` in the hash from Auth0 when returning to our app. The `parseHash()` method callback is then used to get the user's profile (`client.userInfo()`) and set the session by saving the tokens and profile to local storage and updating the `loggedIn$` subject so that any subscribed components in the app are informed that the user is now authenticated. Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject and an `authenticated()` accessor to return current authentication status.
+
+> **Note:** The profile takes the shape of [`profile.model.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/profile.model.ts) from the [OpenID standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims).
+
+The [callback component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/callback) is where the app is redirected after authentication. This component simply shows a loading message until hash parsing is completed and the Angular app redirects back to the home page. 
+
+### Making Authenticated API Requests
+
+In order to make authenticated HTTP requests, we're using [angular2-jwt](https://github.com/auth0/angular2-jwt). The [`auth-http.factory.ts` factory](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth-http.factory.ts) supplies an `authHttp` method that sends the `access_token` from local storage. This is provided in the [`app.module.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts):
+
+```js
+// src/app/app.module.ts
+...
+import { authHttpFactory } from './auth/auth-http.factory';
+...
+  providers: [
+    ...,
+    {
+      provide: AuthHttp,
+      useFactory: authHttpFactory,
+      deps: [Http, RequestOptions]
+    }
+  ],
+```
+
+We can then call our API in the [`api.service.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/api.service.ts) with `AuthHttp` to authorize requests.
+
+```js
+// src/app/api.service.ts
+...
+import { AuthHttp, AuthConfig } from 'angular2-jwt';
+...
+  getDragons$(): Observable<any[]> {
+    return this.authHttp
+      .get(`${this.baseUrl}dragons`)
+      .map(this._handleSuccess)
+      .catch(this._handleError);
+  }
+...
+```
+
+### Final Touches: Route Guard and Profile Page
+
+
