@@ -7,6 +7,10 @@ This repository demonstrates the use of [Auth0](https://auth0.com) with [Angular
 * [Node.js with npm](http://nodejs.org), Node >= 6.9.0, npm >= 3
 * [angular-cli](https://github.com/angular/angular-cli), >= 1.0
 
+## Complete Instructions
+
+For complete instructions on how to set up an Auth0 account, client, and API, as well as how to use this project's Node API and Angular application, please see **[Angular Auth0 Aside](angular-auth0-aside.markdown)**.
+
 ## Installation
 
 Clone this project and from the root, run the following commands to install dependencies for the server and client-side:
