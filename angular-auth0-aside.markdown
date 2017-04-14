@@ -303,6 +303,7 @@ That's it! We have an authenticated Node API and Angular application with login,
 * [Navigating RS256 and JWKS](https://auth0.com/blog/navigating-rs256-and-jwks/)
 * [Access Token](https://auth0.com/docs/tokens/access-token)
 * [Verify Access Tokens](https://auth0.com/docs/api-auth/tutorials/verify-access-token)
+* [Call APIs from Client-side Web Apps](https://auth0.com/docs/api-auth/grant/implicit)
 * [How to implement the Implicit Grant](https://auth0.com/docs/api-auth/tutorials/implicit-grant)
 * [Auth0.js v8 Documentation](https://auth0.com/docs/libraries/auth0js/v8)
 * [OpenID Standard Claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims)
