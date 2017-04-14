@@ -20,7 +20,7 @@ The [sample Angular application and API](https://github.com/auth0-blog/angular-a
 
 ### Sign Up for Auth0
 
-We'll need is an [Auth0](https://auth0.com) account to manage authentication. You can sign up for a [free account here](javascript:signup\(\)). Next, we'll set up an Auth0 client app and API so we can interface Auth0 with our Angular app and Node API.
+You'll need an [Auth0](https://auth0.com) account to manage authentication. You can sign up for a [free account here](javascript:signup\(\)). Next, set up an Auth0 client app and API so Auth0 can interface with an Angular app and Node API.
 
 ### Set Up a Client App
 
@@ -83,6 +83,8 @@ app.get('/api/dragons', jwtCheck, function (req, res) {
 
 Change the `CLIENT_DOMAIN` variable to your Auth0 client domain. The `/api/dragons` route will be protected with [express-jwt](https://github.com/auth0/express-jwt) and [jwks-rsa](https://github.com/auth0/node-jwks-rsa).
 
+> **Note:** To learn more about RS256 and JSON Web Key Set, read [Navigating RS256 and JWKS](https://auth0.com/blog/navigating-rs256-and-jwks/).
+
 Our API is now protected, so let's make sure that our Angular application can also interface with Auth0. To do this, we'll activate the [`src/app/auth/auth0-variables.ts.example` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth0-variables.ts.example) by deleting the `.example` from the file extension. Then open the file and change the `[CLIENT_ID]` and `[CLIENT_DOMAIN]` strings to your Auth0 information:
 
 ```js
@@ -94,7 +96,9 @@ export const AUTH_CONFIG: AuthConfig = {
   ...
 ```
 
-Our app is now set up. Let's take a look at how authentication is implemented.
+Our app and API are now set up. They can be served by running `$ ng serve` from the root folder and `$ node server.js` from the `/server` folder.
+
+With the Node API and Angular app running, let's take a look at how authentication is implemented.
 
 ### Authentication Service
 
@@ -135,6 +139,8 @@ We'll receive an `id_token` and an `access_token` in the hash from Auth0 when re
 
 > **Note:** The profile takes the shape of [`profile.model.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/profile.model.ts) from the [OpenID standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims).
 
+Once `AuthService` is provided in `app.module.ts`, its methods and properties can be used anywhere in our app, such as the [home component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/home).
+
 The [callback component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/callback) is where the app is redirected after authentication. This component simply shows a loading message until hash parsing is completed and the Angular app redirects back to the home page. 
 
 ### Making Authenticated API Requests
@@ -174,4 +180,32 @@ import { AuthHttp, AuthConfig } from 'angular2-jwt';
 
 ### Final Touches: Route Guard and Profile Page
 
+A [profile page component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/profile) can show an authenticated user's profile information. However, we only want this component to be accessible if the user is logged in.
 
+With an [authenticated API request and login/logout](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/home/home.component.ts) implemented, the final touch is to protect our profile route from unauthorized access. The [`auth.guard.ts` route guard](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth.guard.ts) can check authentication and activate routes conditionally. The guard is implemented on specific routes of our choosing in the [`app-routing.module.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app-routing.module.ts) like so:
+
+```js
+// src/app/app-routing.module.ts
+...
+import { AuthGuard } from './auth/auth.guard';
+...
+      {
+        path: 'profile',
+        component: ProfileComponent,
+        canActivate: [
+          AuthGuard
+        ]
+      },
+...
+```
+
+### More Resources
+
+That's it! We have an authenticated Node API and Angular application with login, logout, profile information, and protected routes. To learn more, check out the following resources:
+
+* [Why You Should Always Use Access Tokens to Secure an API](https://auth0.com/blog/why-should-use-accesstokens-to-secure-an-api/)
+* [Navigating RS256 and JWKS](https://auth0.com/blog/navigating-rs256-and-jwks/)
+* [Access Token](https://auth0.com/docs/tokens/access-token)
+* [How to implement the Implicit Grant](https://auth0.com/docs/api-auth/tutorials/implicit-grant)
+* [Auth0.js v8 Documentation](https://auth0.com/docs/libraries/auth0js/v8)
+* [OpenID Standard Claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims)
