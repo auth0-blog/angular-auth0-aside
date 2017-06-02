@@ -22,7 +22,7 @@ var jwtCheck = jwt({
       jwksRequestsPerMinute: 5,
       jwksUri: `https://${CLIENT_DOMAIN}/.well-known/jwks.json`
     }),
-    audience: AUTH0_AUDIENCE,
+    aud: AUTH0_AUDIENCE,
     issuer: `https://${CLIENT_DOMAIN}/`,
     algorithms: ['RS256']
 });
