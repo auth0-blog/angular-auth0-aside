@@ -24,7 +24,7 @@ var jwtCheck = jwt({
     }),
     aud: AUTH0_AUDIENCE,
     issuer: `https://${CLIENT_DOMAIN}/`,
-    algorithms: ['RS256']
+    algorithm: 'RS256'
 });
 
 //--- Set up app

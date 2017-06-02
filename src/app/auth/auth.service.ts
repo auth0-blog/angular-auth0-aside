@@ -39,7 +39,6 @@ export class AuthService {
 
   login() {
     // Auth0 authorize request
-    // Note: nonce is automatically generated: https://auth0.com/docs/libraries/auth0js/v8#using-nonce
     this.auth0.authorize({
       responseType: 'token id_token',
       redirectUri: AUTH_CONFIG.REDIRECT,
