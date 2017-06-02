@@ -24,8 +24,8 @@ You'll need an [Auth0](https://auth0.com) account to manage authentication. You 
 
 ### Set Up a Client App
 
-1. Go to your [**Auth0 Dashboard**](https://manage.auth0.com/#/) and click the "[create a new client](https://manage.auth0.com/#/clients/create)" button. 
-2. Name your new app and select "Single Page Web Applications". 
+1. Go to your [**Auth0 Dashboard**](https://manage.auth0.com/#/) and click the "[create a new client](https://manage.auth0.com/#/clients/create)" button.
+2. Name your new app and select "Single Page Web Applications".
 3. In the **Settings** for your new Auth0 client app, add `http://localhost:4200/callback` to the **Allowed Callback URLs** and `http://localhost:4200` to the **Allowed Origins (CORS)**.
 4. Scroll down to the bottom of the **Settings** section and click "Show Advanced Settings". Choose the **OAuth** tab and change the **JsonWebToken Signature Algorithm** to `RS256`.
 5. If you'd like, you can [set up some social connections](https://manage.auth0.com/#/connections/social). You can then enable them for your app in the **Client** options under the **Connections** tab. The example shown in the screenshot above utilizes username/password database, Facebook, Google, and Twitter.
@@ -73,7 +73,7 @@ var jwtCheck = jwt({
       jwksRequestsPerMinute: 5,
       jwksUri: `https://${CLIENT_DOMAIN}/.well-known/jwks.json`
     }),
-    audience: AUTH0_AUDIENCE,
+    aud: AUTH0_AUDIENCE,
     issuer: `https://${CLIENT_DOMAIN}/`,
     algorithms: ['RS256']
 });
@@ -106,7 +106,7 @@ With the Node API and Angular app running, let's take a look at how authenticati
 
 ### Authentication Service
 
-Authentication logic on the front end is handled with an `AuthService` authentication service: [`src/app/auth/auth.service.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth.service.ts). 
+Authentication logic on the front end is handled with an `AuthService` authentication service: [`src/app/auth/auth.service.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth.service.ts).
 
 ```js
 import { Injectable } from '@angular/core';
@@ -237,7 +237,7 @@ Finally, we have a `logout()` method that clears data from local storage and upd
 
 Once [`AuthService` is provided in `app.module.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts#L32), its methods and properties can be used anywhere in our app, such as the [home component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/home).
 
-The [callback component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/callback) is where the app is redirected after authentication. This component simply shows a loading message until hash parsing is completed and the Angular app redirects back to the home page. 
+The [callback component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/callback) is where the app is redirected after authentication. This component simply shows a loading message until hash parsing is completed and the Angular app redirects back to the home page.
 
 ### Making Authenticated API Requests
 
