@@ -16,9 +16,9 @@ export class ProfileComponent implements OnInit {
   }
 
   private _makeProfileArray(obj) {
-    let keyPropArray = [];
+    const keyPropArray = [];
 
-    for (let key in obj) {
+    for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         keyPropArray.push(key + ': ' + obj[key]);
       }

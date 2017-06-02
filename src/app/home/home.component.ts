@@ -18,7 +18,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Subscribe to login status subject
     // If authenticated, subscribe to dragons data observable
-    // If not authenticated, unsubscribe from dragons data 
+    // If not authenticated, unsubscribe from dragons data
     this.authSubscription = this.auth.loggedIn$.subscribe(loggedIn => {
       if (loggedIn) {
         this._getDragons();
@@ -42,7 +42,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.dragons = data;
       },
       err => console.warn(err),
-      () => console.info('Request complete')
+      () => console.log('Request complete')
     );
   }
 
