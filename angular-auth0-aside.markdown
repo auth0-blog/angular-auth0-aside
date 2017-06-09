@@ -125,7 +125,11 @@ export class AuthService {
   // @TODO: Update AUTH_CONFIG and remove .example extension in src/app/auth/auth0-variables.ts.example
   auth0 = new auth0.WebAuth({
     clientID: AUTH_CONFIG.CLIENT_ID,
-    domain: AUTH_CONFIG.CLIENT_DOMAIN
+    domain: AUTH_CONFIG.CLIENT_DOMAIN,
+    responseType: 'token id_token',
+    redirectUri: AUTH_CONFIG.REDIRECT,
+    audience: AUTH_CONFIG.AUDIENCE,
+    scope: AUTH_CONFIG.SCOPE
   });
 
   userProfile: UserProfile;
@@ -150,12 +154,7 @@ export class AuthService {
 
   login() {
     // Auth0 authorize request
-    this.auth0.authorize({
-      responseType: 'token id_token',
-      redirectUri: AUTH_CONFIG.REDIRECT,
-      audience: AUTH_CONFIG.AUDIENCE,
-      scope: AUTH_CONFIG.SCOPE
-    });
+    this.auth0.authorize();
   }
 
   handleAuth() {
@@ -211,7 +210,7 @@ This service uses the config variables from `auth0-variables.ts` to instantiate 
 
 An [RxJS `BehaviorSubject`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/subjects/behaviorsubject.md) is used to provide a stream of authentication status events that you can subscribe to anywhere in the app.
 
-The `login()` method authorizes the authentication request with Auth0 using your config variables. An Auth0 hosted Lock instance will be shown to the user and they can then log in:
+The `login()` method authorizes the authentication request with Auth0 using your config variables. An Auth0 hosted Lock instance will be shown to the user and they can then log in.
 
 > **Note:** If it's the user's first visit to our app _and_ our callback is on `localhost`, they'll also be presented with a consent screen where they can grant access to our API. A first party client on a non-localhost domain would be highly trusted, so the consent dialog would not be presented in this case. You can modify this by editing your [Auth0 Dashboard API](https://manage.auth0.com/#/apis) **Settings**. Look for the "Allow Skipping User Consent" toggle.
 

@@ -14,7 +14,11 @@ export class AuthService {
   // @TODO: Update AUTH_CONFIG and remove .example extension in src/app/auth/auth0-variables.ts.example
   auth0 = new auth0.WebAuth({
     clientID: AUTH_CONFIG.CLIENT_ID,
-    domain: AUTH_CONFIG.CLIENT_DOMAIN
+    domain: AUTH_CONFIG.CLIENT_DOMAIN,
+    responseType: 'token id_token',
+    redirectUri: AUTH_CONFIG.REDIRECT,
+    audience: AUTH_CONFIG.AUDIENCE,
+    scope: AUTH_CONFIG.SCOPE
   });
 
   userProfile: UserProfile;
@@ -39,12 +43,7 @@ export class AuthService {
 
   login() {
     // Auth0 authorize request
-    this.auth0.authorize({
-      responseType: 'token id_token',
-      redirectUri: AUTH_CONFIG.REDIRECT,
-      audience: AUTH_CONFIG.AUDIENCE,
-      scope: AUTH_CONFIG.SCOPE
-    });
+    this.auth0.authorize();
   }
 
   handleAuth() {
