@@ -1,11 +1,11 @@
 # angular-auth0-aside
 
-This repository demonstrates the use of [Auth0](https://auth0.com) with [Angular](https://angular.io) v4 (with [Angular CLI](https://github.com/angular/angular-cli)) and a sample Node API with a protected route.
+This repository demonstrates the use of [Auth0](https://auth0.com) with [Angular](https://angular.io) (with [Angular CLI](https://github.com/angular/angular-cli)) and a sample Node API with a protected route.
 
 ## Dependencies
 
 * [Node.js with npm](http://nodejs.org), Node >= 6.9.0, npm >= 3
-* [angular-cli](https://github.com/angular/angular-cli), >= 1.0
+* [@angular/cli](https://github.com/angular/angular-cli), >= 1.0
 
 ## Complete Instructions
 
@@ -21,13 +21,13 @@ $ cd server
 $ npm install
 ```
 
-1. Open `server/server.js` and replace `[CLIENT_DOMAIN].auth0.com` with your Auth0 domain.
+1. Open `server/server.js` and replace `[CLIENT_DOMAIN]` with your Auth0 domain.
 2. Open `src/app/auth/auth0-variables.ts.example` and remove `.example` from the file name. Then replace `[CLIENT_ID]` and `[CLIENT_DOMAIN]` with your Auth0 client ID and domain.
 
 ## Serving the project
 
-* Node server: `$ node server.js` from the `/server` folder.
-* Angular: `$ ng serve` from the root folder.
+* Node server: `node server.js` from the `/server` folder.
+* Angular: `ng serve` from the root folder.
 
 ## What is Auth0?
 
