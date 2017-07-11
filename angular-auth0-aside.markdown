@@ -62,7 +62,7 @@ Open the [`server.js` file](https://github.com/auth0-blog/angular-auth0-aside/bl
 ...
 // @TODO: change [CLIENT_DOMAIN] to your Auth0 domain name.
 // @TODO: change [AUTH0_API_AUDIENCE] to your Auth0 API audience.
-var CLIENT_DOMAIN = '[CLIENT_DOMAIN]'; // ie., youraccount.auth0.com
+var CLIENT_DOMAIN = '[CLIENT_DOMAIN]'; // e.g., youraccount.auth0.com
 var AUTH0_AUDIENCE = '[AUTH0_API_AUDIENCE]'; // http://localhost:3001/api in this example
 
 var jwtCheck = jwt({
