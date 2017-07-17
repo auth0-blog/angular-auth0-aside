@@ -1,28 +1,25 @@
 import { Injectable } from '@angular/core';
-import { Http, RequestOptions, Response } from '@angular/http';
-import { AuthHttp, AuthConfig } from 'angular2-jwt';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Rx';
-import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class ApiService {
   private baseUrl = 'http://localhost:3001/api/';
 
-  constructor(private authHttp: AuthHttp) { }
+  constructor(private http: HttpClient) { }
 
   getDragons$(): Observable<any[]> {
-    return this.authHttp
-      .get(`${this.baseUrl}dragons`)
-      .map(this._handleSuccess)
+    return this.http
+      .get(`${this.baseUrl}dragons`, {
+        headers: new HttpHeaders().set(
+          'Authorization', `Bearer ${localStorage.getItem('access_token')}`
+        )
+      })
       .catch(this._handleError);
   }
 
-  private _handleSuccess(res: Response) {
-    return res.json();
-  }
-
-  private _handleError(err: Response | any) {
+  private _handleError(err: HttpErrorResponse | any) {
     const errorMsg = err.message || 'Unable to retrieve data';
     return Observable.throw(errorMsg);
   }

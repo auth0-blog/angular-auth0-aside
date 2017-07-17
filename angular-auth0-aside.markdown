@@ -15,8 +15,7 @@ The [sample Angular application and API](https://github.com/auth0-blog/angular-a
 * Profile page requires authentication for access using route guards
 * Authentication service uses a subject to propagate authentication status events to the entire app
 * User profile is fetched on authentication and stored in authentication service
-* Access token, ID token, and profile are stored in local storage and removed upon logout
-* Authenticated API requests are made with the [angular2-jwt](https://github.com/auth0/angular2-jwt) helper library
+* Access token, ID token, profile, and token expiration are stored in local storage and removed upon logout
 
 ### Sign Up for Auth0
 
@@ -111,12 +110,9 @@ Authentication logic on the front end is handled with an `AuthService` authentic
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as auth0 from 'auth0-js';
 import { AUTH_CONFIG } from './auth0-variables';
-import { tokenNotExpired } from 'angular2-jwt';
 import { UserProfile } from './profile.model';
-
-// Avoid name not found warnings
-declare var auth0: any;
 
 @Injectable()
 export class AuthService {
@@ -130,7 +126,6 @@ export class AuthService {
     audience: AUTH_CONFIG.AUDIENCE,
     scope: AUTH_CONFIG.SCOPE
   });
-
   userProfile: UserProfile;
 
   // Create a stream of logged in status to communicate throughout app
@@ -182,6 +177,7 @@ export class AuthService {
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('profile', JSON.stringify(profile));
+    localStorage.setItem('expires_at', authResult.expiresAt);
     this.userProfile = profile;
     this.setLoggedIn(true);
   }
@@ -191,13 +187,15 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('profile');
+    localStorage.removeItem('expires_at');
     this.userProfile = undefined;
     this.setLoggedIn(false);
   }
 
-  get authenticated() {
-    // Check if there's an unexpired access token
-    return tokenNotExpired('access_token');
+  get authenticated(): boolean {
+    // Check if current time is past access token's expiration
+    const expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+    return Date.now() < expiresAt;
   }
 
 }
@@ -205,15 +203,13 @@ export class AuthService {
 
 This service uses the config variables from `auth0-variables.ts` to instantiate an `auth0.js` WebAuth instance.
 
-> **Note:** `auth0.js` is linked in the `index.html` file from CDN.
-
 An [RxJS `BehaviorSubject`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/subjects/behaviorsubject.md) is used to provide a stream of authentication status events that you can subscribe to anywhere in the app.
 
 The `login()` method authorizes the authentication request with Auth0 using your config variables. An Auth0 hosted Lock instance will be shown to the user and they can then log in.
 
 > **Note:** If it's the user's first visit to our app _and_ our callback is on `localhost`, they'll also be presented with a consent screen where they can grant access to our API. A first party client on a non-localhost domain would be highly trusted, so the consent dialog would not be presented in this case. You can modify this by editing your [Auth0 Dashboard API](https://manage.auth0.com/#/apis) **Settings**. Look for the "Allow Skipping User Consent" toggle.
 
-We'll receive an `id_token` and an `access_token` in the hash from Auth0 when returning to our app. The `handleAuth()` method uses Auth0's `parseHash()` method callback to get the user's profile (`_getProfile()`) and set the session (`_setSession()`) by saving the tokens and profile to local storage and updating the `loggedIn$` subject so that any subscribed components in the app are informed that the user is now authenticated.
+We'll receive an `id_token`, `access_token`, and `expires_at` in the hash from Auth0 when returning to our app. The `handleAuth()` method uses Auth0's `parseHash()` method callback to get the user's profile (`_getProfile()`) and set the session (`_setSession()`) by saving the tokens, profile, and token expiration to local storage and updating the `loggedIn$` subject so that any subscribed components in the app are informed that the user is now authenticated.
 
 > **Note:** The profile takes the shape of [`profile.model.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/profile.model.ts) from the [OpenID standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims).
 
@@ -230,7 +226,7 @@ import { AuthService } from './auth/auth.service';
 ...
 ```
 
-Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject. We also have an `authenticated()` accessor to return current authentication status.
+Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject. We also have an `authenticated` accessor to return current authentication status.
 
 Once [`AuthService` is provided in `app.module.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts#L32), its methods and properties can be used anywhere in our app, such as the [home component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/home).
 
@@ -238,34 +234,18 @@ The [callback component](https://github.com/auth0-blog/angular-auth0-aside/tree/
 
 ### Making Authenticated API Requests
 
-In order to make authenticated HTTP requests, we're using [angular2-jwt](https://github.com/auth0/angular2-jwt). The [`auth-http.factory.ts` factory](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth-http.factory.ts) supplies an `authHttp` method that sends the `access_token` from local storage. This is provided in the [`app.module.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts):
-
-```js
-// src/app/app.module.ts
-...
-import { authHttpFactory } from './auth/auth-http.factory';
-...
-  providers: [
-    ...,
-    {
-      provide: AuthHttp,
-      useFactory: authHttpFactory,
-      deps: [Http, RequestOptions]
-    }
-  ],
-```
-
-We can then call our API in the [`api.service.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/api.service.ts) with `AuthHttp` to authorize requests.
+In order to make authenticated HTTP requests, we need to add a `Authorization` header with the access token in our [`api.service.ts` file](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/api.service.ts).
 
 ```js
 // src/app/api.service.ts
 ...
-import { AuthHttp, AuthConfig } from 'angular2-jwt';
-...
   getDragons$(): Observable<any[]> {
-    return this.authHttp
-      .get(`${this.baseUrl}dragons`)
-      .map(this._handleSuccess)
+    return this.http
+      .get(`${this.baseUrl}dragons`, {
+        headers: new HttpHeaders().set(
+          'Authorization', `Bearer ${localStorage.getItem('access_token')}`
+        )
+      })
       .catch(this._handleError);
   }
 ...

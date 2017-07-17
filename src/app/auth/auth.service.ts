@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as auth0 from 'auth0-js';
 import { AUTH_CONFIG } from './auth0-variables';
-import { tokenNotExpired } from 'angular2-jwt';
 import { UserProfile } from './profile.model';
-
-// Avoid name not found warnings
-declare var auth0: any;
 
 @Injectable()
 export class AuthService {
@@ -20,7 +17,6 @@ export class AuthService {
     audience: AUTH_CONFIG.AUDIENCE,
     scope: AUTH_CONFIG.SCOPE
   });
-
   userProfile: UserProfile;
 
   // Create a stream of logged in status to communicate throughout app
@@ -72,6 +68,7 @@ export class AuthService {
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('profile', JSON.stringify(profile));
+    localStorage.setItem('expires_at', authResult.expiresAt);
     this.userProfile = profile;
     this.setLoggedIn(true);
   }
@@ -81,13 +78,15 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('profile');
+    localStorage.removeItem('expires_at');
     this.userProfile = undefined;
     this.setLoggedIn(false);
   }
 
   get authenticated() {
-    // Check if there's an unexpired access token
-    return tokenNotExpired('access_token');
+    // Check if current time is past access token's expiration
+    const expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+    return Date.now() < expiresAt;
   }
 
 }
