@@ -12,8 +12,8 @@ var dragonsJson = require('./dragons.json');
 //-- JWT check
 // @TODO: change [CLIENT_DOMAIN] to your Auth0 domain name.
 // @TODO: change [AUTH0_API_AUDIENCE] to your Auth0 API audience.
-var CLIENT_DOMAIN = 'kmaida.auth0.com'; // e.g., 'youraccount.auth0.com'
-var AUTH0_AUDIENCE = 'Rp1ZbPH6fK93lynaOt6HyQa3KcvN7Xl8'; // 'http://localhost:3001/api' in this example
+var CLIENT_DOMAIN = '[CLIENT_DOMAIN]'; // e.g., 'youraccount.auth0.com'
+var AUTH0_AUDIENCE = '[AUTH0_API_AUDIENCE]'; // 'http://localhost:3001/api/' in this example
 
 var jwtCheck = jwt({
     secret: jwks.expressJwtSecret({
@@ -22,7 +22,7 @@ var jwtCheck = jwt({
       jwksRequestsPerMinute: 5,
       jwksUri: `https://${CLIENT_DOMAIN}/.well-known/jwks.json`
     }),
-    aud: AUTH0_AUDIENCE,
+    audience: AUTH0_AUDIENCE,
     issuer: `https://${CLIENT_DOMAIN}/`,
     algorithm: 'RS256'
 });
