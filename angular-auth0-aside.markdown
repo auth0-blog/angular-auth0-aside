@@ -173,7 +173,7 @@ export class AuthService {
   }
 
   private _setSession(authResult, profile) {
-    const expTime = new Date(Date.now() + authResult.expiresIn * 1000);
+    const expTime = authResult.expiresIn * 1000 + Date.now();
     // Save session data and update login status subject
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
@@ -195,8 +195,8 @@ export class AuthService {
 
   get authenticated(): boolean {
     // Check if current date is greater than expiration
-    const expiresAt = new Date(JSON.parse(localStorage.getItem('expires_at')));
-    return Date.now() < expiresAt.getTime();
+    const expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+    return Date.now() < expiresAt;
   }
 
 }
