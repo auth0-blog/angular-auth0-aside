@@ -5,12 +5,12 @@
 </div>
 
 <div *ngIf="auth.authenticated">
-  <p>Hello, <a routerLink="/profile" href>{{auth.userProfile.name}}</a>!</p>
+  <p>Hello, <a routerLink="/profile" href>{{auth.userProfile?.name}}</a>!</p>
   <button (click)="auth.logout()">Log Out</button>
 
   <div *ngIf="dragonsExist">
     <h2>Here Be Dragons</h2>
-    
+
     <ul>
       <li *ngFor="let dragon of dragons">
         {{dragon.name}} - {{dragon.source}}

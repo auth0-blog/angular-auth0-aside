@@ -64,11 +64,12 @@ export class AuthService {
   }
 
   private _setSession(authResult, profile) {
+    const expTime = new Date(Date.now() + authResult.expiresIn * 1000);
     // Save session data and update login status subject
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('profile', JSON.stringify(profile));
-    localStorage.setItem('expires_in', authResult.expiresIn);
+    localStorage.setItem('expires_at', JSON.stringify(expTime));
     this.userProfile = profile;
     this.setLoggedIn(true);
   }
@@ -78,15 +79,15 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('profile');
-    localStorage.removeItem('expires_in');
+    localStorage.removeItem('expires_at');
     this.userProfile = undefined;
     this.setLoggedIn(false);
   }
 
   get authenticated(): boolean {
-    // Check if access token expires in less than 10 seconds
-    const expiresIn = JSON.parse(localStorage.getItem('expires_in'));
-    return expiresIn < 10;
+    // Check if current date is greater than expiration
+    const expiresAt = new Date(JSON.parse(localStorage.getItem('expires_at')));
+    return Date.now() < expiresAt.getTime();
   }
 
 }

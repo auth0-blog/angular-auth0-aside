@@ -173,11 +173,12 @@ export class AuthService {
   }
 
   private _setSession(authResult, profile) {
+    const expTime = new Date(Date.now() + authResult.expiresIn * 1000);
     // Save session data and update login status subject
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('profile', JSON.stringify(profile));
-    localStorage.setItem('expires_in', authResult.expiresIn);
+    localStorage.setItem('expires_at', JSON.stringify(expTime));
     this.userProfile = profile;
     this.setLoggedIn(true);
   }
@@ -187,15 +188,15 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('profile');
-    localStorage.removeItem('expires_in');
+    localStorage.removeItem('expires_at');
     this.userProfile = undefined;
     this.setLoggedIn(false);
   }
 
   get authenticated(): boolean {
-    // Check if access token expires in less than 10 seconds
-    const expiresIn = JSON.parse(localStorage.getItem('expires_in'));
-    return expiresIn < 10;
+    // Check if current date is greater than expiration
+    const expiresAt = new Date(JSON.parse(localStorage.getItem('expires_at')));
+    return Date.now() < expiresAt.getTime();
   }
 
 }
@@ -226,7 +227,7 @@ import { AuthService } from './auth/auth.service';
 ...
 ```
 
-Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject. We also have an `authenticated` accessor to return current authentication status based on time until access token expiration.
+Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject. We also have an `authenticated` accessor to return current authentication status based on access token expiration.
 
 Once [`AuthService` is provided in `app.module.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts#L32), its methods and properties can be used anywhere in our app, such as the [home component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/home).
 
