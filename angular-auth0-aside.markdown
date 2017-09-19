@@ -177,7 +177,7 @@ export class AuthService {
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('profile', JSON.stringify(profile));
-    localStorage.setItem('expires_at', authResult.expiresAt);
+    localStorage.setItem('expires_in', authResult.expiresIn);
     this.userProfile = profile;
     this.setLoggedIn(true);
   }
@@ -187,15 +187,15 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('profile');
-    localStorage.removeItem('expires_at');
+    localStorage.removeItem('expires_in');
     this.userProfile = undefined;
     this.setLoggedIn(false);
   }
 
   get authenticated(): boolean {
-    // Check if current time is past access token's expiration
-    const expiresAt = JSON.parse(localStorage.getItem('expires_at'));
-    return Date.now() < expiresAt;
+    // Check if access token expires in less than 10 seconds
+    const expiresIn = JSON.parse(localStorage.getItem('expires_in'));
+    return expiresIn < 10;
   }
 
 }
@@ -209,7 +209,7 @@ The `login()` method authorizes the authentication request with Auth0 using your
 
 > **Note:** If it's the user's first visit to our app _and_ our callback is on `localhost`, they'll also be presented with a consent screen where they can grant access to our API. A first party client on a non-localhost domain would be highly trusted, so the consent dialog would not be presented in this case. You can modify this by editing your [Auth0 Dashboard API](https://manage.auth0.com/#/apis) **Settings**. Look for the "Allow Skipping User Consent" toggle.
 
-We'll receive an `id_token`, `access_token`, and `expires_at` in the hash from Auth0 when returning to our app. The `handleAuth()` method uses Auth0's `parseHash()` method callback to get the user's profile (`_getProfile()`) and set the session (`_setSession()`) by saving the tokens, profile, and token expiration to local storage and updating the `loggedIn$` subject so that any subscribed components in the app are informed that the user is now authenticated.
+We'll receive `idToken`, `accessToken`, and `expiresIn` in the hash from Auth0 when returning to our app. The `handleAuth()` method uses Auth0's `parseHash()` method callback to get the user's profile (`_getProfile()`) and set the session (`_setSession()`) by saving the tokens, profile, and token expiration to local storage and updating the `loggedIn$` subject so that any subscribed components in the app are informed that the user is now authenticated.
 
 > **Note:** The profile takes the shape of [`profile.model.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/profile.model.ts) from the [OpenID standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims).
 
@@ -226,7 +226,7 @@ import { AuthService } from './auth/auth.service';
 ...
 ```
 
-Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject. We also have an `authenticated` accessor to return current authentication status.
+Finally, we have a `logout()` method that clears data from local storage and updates the `loggedIn$` subject. We also have an `authenticated` accessor to return current authentication status based on time until access token expiration.
 
 Once [`AuthService` is provided in `app.module.ts`](https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts#L32), its methods and properties can be used anywhere in our app, such as the [home component](https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/home).
 
