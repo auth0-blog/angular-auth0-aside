@@ -7,7 +7,7 @@ import { AuthService } from './auth/auth.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(private auth: AuthService) {
+  constructor(public auth: AuthService) {
     // Check for authentication and handle if hash present
     auth.handleAuth();
   }
