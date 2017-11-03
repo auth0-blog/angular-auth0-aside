@@ -1,29 +1,29 @@
 'use strict';
 
 //-- Require
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var cors = require('cors');
-var jwt = require('express-jwt');
-var jwks = require('jwks-rsa');
-var dragonsJson = require('./dragons.json');
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const jwt = require('express-jwt');
+const jwks = require('jwks-rsa');
+const dragonsJson = require('./dragons.json');
+const config = require('./config.js');
 
 //-- JWT check
-// @TODO: change [CLIENT_DOMAIN] to your Auth0 domain name.
-// @TODO: change [AUTH0_API_AUDIENCE] to your Auth0 API audience.
-var CLIENT_DOMAIN = '[CLIENT_DOMAIN]'; // e.g., 'youraccount.auth0.com'
-var AUTH0_AUDIENCE = '[AUTH0_API_AUDIENCE]'; // 'http://localhost:3001/api/' in this example
 
-var jwtCheck = jwt({
+// @TODO: Remove .SAMPLE from /server/config.js.SAMPLE
+// and update with your proper Auth0 information
+
+const jwtCheck = jwt({
     secret: jwks.expressJwtSecret({
       cache: true,
       rateLimit: true,
       jwksRequestsPerMinute: 5,
-      jwksUri: `https://${CLIENT_DOMAIN}/.well-known/jwks.json`
+      jwksUri: `https://${config.CLIENT_DOMAIN}/.well-known/jwks.json`
     }),
-    audience: AUTH0_AUDIENCE,
-    issuer: `https://${CLIENT_DOMAIN}/`,
+    audience: config.AUTH0_AUDIENCE,
+    issuer: `https://${config.CLIENT_DOMAIN}/`,
     algorithm: 'RS256'
 });
 
