@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as auth0 from 'auth0-js';
 import { AUTH_CONFIG } from './auth0-variables';
@@ -23,7 +22,7 @@ export class AuthService {
   loggedIn: boolean;
   loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
 
-  constructor(private router: Router) {
+  constructor() {
     // If authenticated, set local profile property and update login status subject
     if (this.authenticated) {
       this.userProfile = JSON.parse(localStorage.getItem('profile'));
@@ -48,9 +47,7 @@ export class AuthService {
       if (authResult && authResult.accessToken && authResult.idToken) {
         window.location.hash = '';
         this._getProfile(authResult);
-        this.router.navigate(['/']);
       } else if (err) {
-        this.router.navigate(['/']);
         console.error(`Error: ${err.error}`);
       }
     });
