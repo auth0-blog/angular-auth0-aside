@@ -31,7 +31,7 @@ $ npm install
 
 ### Running on Docker
 
-After running the following commands, the app will be available at [`http://localhost:8080`](http://localhost:8080).
+After running the following commands, the app will be available at [`http://localhost:4200`](http://localhost:4200).
 
 ```bash
 # build the image
