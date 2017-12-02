@@ -8,6 +8,7 @@ import {getProfile} from 'auth0-web';
 })
 export class ProfileComponent implements OnInit {
   profileArray = this._makeProfileArray(getProfile());
+  getUserProfile = getProfile;
 
   constructor() {
   }
