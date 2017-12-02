@@ -13,7 +13,7 @@ export class CallbackComponent implements OnInit {
   constructor(private auth: AuthService, private router: Router) { }
 
   ngOnInit() {
-    this.auth.loggedIn$.subscribe(
+    this.auth.subscribe(
       loggedIn => loggedIn ? this.router.navigate(['/']) : null
     )
   }

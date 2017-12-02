@@ -10,7 +10,7 @@ import { AuthService } from './../auth/auth.service';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   dragons: any[];
-  authSubscription: Subscription;
+  authSubscription: { unsubscribe: () => void };
   dragonsSubscription: Subscription;
 
   constructor(private api: ApiService, public auth: AuthService) { }
@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Subscribe to login status subject
     // If authenticated, subscribe to dragons data observable
     // If not authenticated, unsubscribe from dragons data
-    this.authSubscription = this.auth.loggedIn$.subscribe(loggedIn => {
+    this.authSubscription = this.auth.subscribe(loggedIn => {
       if (loggedIn) {
         this._getDragons();
       } else {
