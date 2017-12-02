@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
-import { ApiService } from './../api.service';
-import { AuthService } from './../auth/auth.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Subscription} from 'rxjs/Subscription';
+import {ApiService} from '../api.service';
+import * as Auth0Client from 'auth0-web';
 
 @Component({
   selector: 'app-home',
@@ -10,16 +10,18 @@ import { AuthService } from './../auth/auth.service';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   dragons: any[];
-  authSubscription: Subscription;
+  authSubscription: { unsubscribe: () => void };
   dragonsSubscription: Subscription;
+  auth = Auth0Client;
 
-  constructor(private api: ApiService, public auth: AuthService) { }
+  constructor(private api: ApiService) {
+  }
 
   ngOnInit() {
     // Subscribe to login status subject
     // If authenticated, subscribe to dragons data observable
     // If not authenticated, unsubscribe from dragons data
-    this.authSubscription = this.auth.loggedIn$.subscribe(loggedIn => {
+    this.authSubscription = Auth0Client.subscribe(loggedIn => {
       if (loggedIn) {
         this._getDragons();
       } else {
