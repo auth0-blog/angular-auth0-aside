@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
-import { AuthService } from './../auth/auth.service';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {subscribe} from 'auth0-web';
 
 @Component({
   selector: 'app-callback',
@@ -10,10 +9,11 @@ import { Router } from '@angular/router';
 })
 export class CallbackComponent implements OnInit {
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(private router: Router) {
+  }
 
   ngOnInit() {
-    this.auth.subscribe(
+    subscribe(
       loggedIn => loggedIn ? this.router.navigate(['/']) : null
     )
   }

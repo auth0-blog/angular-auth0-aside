@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthService } from './../auth/auth.service';
+import {Component, OnInit} from '@angular/core';
+import {getProfile} from 'auth0-web';
 
 @Component({
   selector: 'app-profile',
@@ -7,12 +7,13 @@ import { AuthService } from './../auth/auth.service';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  profileArray = this._makeProfileArray(this.auth.userProfile);
+  profileArray = this._makeProfileArray(getProfile());
 
-  constructor(public auth: AuthService) { }
+  constructor() {
+  }
 
   ngOnInit() {
-    console.log(this.auth.userProfile);
+    console.log(getProfile());
   }
 
   private _makeProfileArray(obj) {
