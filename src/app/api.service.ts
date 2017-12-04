@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
+import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class ApiService {
@@ -16,7 +16,9 @@ export class ApiService {
           'Authorization', `Bearer ${localStorage.getItem('access_token')}`
         )
       })
-      .catch(this._handleError);
+      .pipe(
+        catchError(this._handleError)
+      );
   }
 
   private _handleError(err: HttpErrorResponse | any) {

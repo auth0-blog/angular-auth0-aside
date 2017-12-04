@@ -10,7 +10,10 @@ import { Router } from '@angular/router';
 })
 export class CallbackComponent implements OnInit {
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(private auth: AuthService, private router: Router) {
+    // Parse authentication hash
+    auth.handleAuth();
+  }
 
   ngOnInit() {
     this.auth.loggedIn$.subscribe(
