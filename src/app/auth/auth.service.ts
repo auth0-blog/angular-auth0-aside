@@ -44,7 +44,7 @@ export class AuthService {
   handleAuth() {
     // When Auth0 hash parsed, get profile
     this.auth0.parseHash((err, authResult) => {
-      if (authResult && authResult.accessToken && authResult.idToken) {
+      if (authResult && authResult.accessToken) {
         window.location.hash = '';
         this._getProfile(authResult);
       } else if (err) {
@@ -64,7 +64,6 @@ export class AuthService {
     const expTime = authResult.expiresIn * 1000 + Date.now();
     // Save session data and update login status subject
     localStorage.setItem('access_token', authResult.accessToken);
-    localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('profile', JSON.stringify(profile));
     localStorage.setItem('expires_at', JSON.stringify(expTime));
     this.userProfile = profile;
@@ -74,7 +73,6 @@ export class AuthService {
   logout() {
     // Remove tokens and profile and update login status subject
     localStorage.removeItem('access_token');
-    localStorage.removeItem('id_token');
     localStorage.removeItem('profile');
     localStorage.removeItem('expires_at');
     this.userProfile = undefined;
