@@ -8,7 +8,7 @@ import { UserProfile } from './profile.model';
 export class AuthService {
   // Create Auth0 web auth instance
   // @TODO: Update AUTH_CONFIG and remove .example extension in src/app/auth/auth0-variables.ts.example
-  auth0 = new auth0.WebAuth({
+  private _auth0 = new auth0.WebAuth({
     clientID: AUTH_CONFIG.CLIENT_ID,
     domain: AUTH_CONFIG.CLIENT_DOMAIN,
     responseType: 'token',
@@ -17,20 +17,19 @@ export class AuthService {
     scope: AUTH_CONFIG.SCOPE
   });
   userProfile: UserProfile;
+  accessToken: string;
 
   // Create a stream of logged in status to communicate throughout app
   loggedIn: boolean;
   loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
 
   constructor() {
-    // If authenticated, set local profile property and update login status subject
-    if (this.authenticated) {
-      this.userProfile = JSON.parse(localStorage.getItem('profile'));
-      this.setLoggedIn(true);
-    }
+    // You can restore an unexpired authentication session on init
+    // by using the checkSession() endpoint from auth0.js:
+    // https://auth0.com/docs/libraries/auth0js/v9#using-checksession-to-acquire-new-tokens
   }
 
-  setLoggedIn(value: boolean) {
+  private _setLoggedIn(value: boolean) {
     // Update login status subject
     this.loggedIn$.next(value);
     this.loggedIn = value;
@@ -38,24 +37,24 @@ export class AuthService {
 
   login() {
     // Auth0 authorize request
-    this.auth0.authorize();
+    this._auth0.authorize();
   }
 
-  handleAuth() {
+  handleLoginCallback() {
     // When Auth0 hash parsed, get profile
-    this.auth0.parseHash((err, authResult) => {
+    this._auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken) {
         window.location.hash = '';
-        this._getProfile(authResult);
+        this.getUserInfo(authResult);
       } else if (err) {
         console.error(`Error: ${err.error}`);
       }
     });
   }
 
-  private _getProfile(authResult) {
+  getUserInfo(authResult) {
     // Use access token to retrieve user's profile and set session
-    this.auth0.client.userInfo(authResult.accessToken, (err, profile) => {
+    this._auth0.client.userInfo(authResult.accessToken, (err, profile) => {
       this._setSession(authResult, profile);
     });
   }
@@ -63,26 +62,25 @@ export class AuthService {
   private _setSession(authResult, profile) {
     const expTime = authResult.expiresIn * 1000 + Date.now();
     // Save session data and update login status subject
-    localStorage.setItem('access_token', authResult.accessToken);
-    localStorage.setItem('profile', JSON.stringify(profile));
     localStorage.setItem('expires_at', JSON.stringify(expTime));
+    this.accessToken = authResult.accessToken;
     this.userProfile = profile;
-    this.setLoggedIn(true);
+    this._setLoggedIn(true);
   }
 
   logout() {
-    // Remove tokens and profile and update login status subject
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('profile');
+    // Remove token and profile and update login status subject
     localStorage.removeItem('expires_at');
+    this.accessToken = undefined;
     this.userProfile = undefined;
-    this.setLoggedIn(false);
+    this._setLoggedIn(false);
   }
 
   get authenticated(): boolean {
     // Check if current date is greater than expiration
+    // and user is currently logged in
     const expiresAt = JSON.parse(localStorage.getItem('expires_at'));
-    return Date.now() < expiresAt;
+    return (Date.now() < expiresAt) && this.loggedIn;
   }
 
 }

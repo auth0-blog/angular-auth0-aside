@@ -13,7 +13,7 @@ export class CallbackComponent implements OnInit, OnDestroy {
 
   constructor(private auth: AuthService, private router: Router) {
     // Parse authentication hash
-    auth.handleAuth();
+    auth.handleLoginCallback();
   }
 
   ngOnInit() {
