@@ -19,7 +19,7 @@ export class CallbackComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.loggedInSub = this.auth.loggedIn$.subscribe(
       loggedIn => loggedIn ? this.router.navigate(['/']) : null
-    )
+    );
   }
 
   ngOnDestroy() {
