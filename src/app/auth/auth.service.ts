@@ -72,13 +72,15 @@ export class AuthService {
   }
 
   logout() {
-    // Remove token and profile and update login status subject
+    // Remove token and profile, update login status subject,
+    // and log out of Auth0 authentication session
     this.expiresAt = undefined;
     this.accessToken = undefined;
     this.userProfile = undefined;
     this._setLoggedIn(false);
     this._Auth0.logout({
-      returnTo: 'http://localhost:4200'
+      returnTo: 'http://localhost:4200',
+      clientID: AUTH_CONFIG.CLIENT_ID
     });
   }
 
