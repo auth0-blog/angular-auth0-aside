@@ -5,7 +5,7 @@ This repository demonstrates the use of [Auth0](https://auth0.com) with [Angular
 ## Dependencies
 
 * [Node.js with npm](http://nodejs.org), Node >= 6.9.0, npm >= 3
-* [@angular/cli](https://github.com/angular/angular-cli), >= 1.5
+* [@angular/cli](https://github.com/angular/angular-cli), >= 6
 
 ## Complete Instructions
 
@@ -26,8 +26,9 @@ $ npm install
 
 ## Serving the project
 
-* Node server: run `node server` from the `/server` folder.
-* Angular: run `ng serve` from the root folder.
+```bash
+$ npm start
+```
 
 ## What is Auth0?
 

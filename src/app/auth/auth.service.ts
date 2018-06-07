@@ -74,10 +74,9 @@ export class AuthService {
   logout() {
     // Remove token and profile, update login status subject,
     // and log out of Auth0 authentication session
-    this.expiresAt = undefined;
-    this.accessToken = undefined;
-    this.userProfile = undefined;
-    this._setLoggedIn(false);
+    // This does a refresh and redirects back to homepage
+    // Make sure you have the returnTo URL in your Auth0
+    // Dashboard Application settings in Allowed Logout URLs
     this._Auth0.logout({
       returnTo: 'http://localhost:4200',
       clientID: AUTH_CONFIG.CLIENT_ID
