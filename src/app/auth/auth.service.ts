@@ -4,8 +4,6 @@ import * as auth0 from 'auth0-js';
 import { AUTH_CONFIG } from './auth0-variables';
 import { UserProfile } from './profile.model';
 
-(window as any).global = window;
-
 @Injectable()
 export class AuthService {
   // Create Auth0 web auth instance
