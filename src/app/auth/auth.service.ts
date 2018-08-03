@@ -12,7 +12,7 @@ export class AuthService {
   private _Auth0 = new auth0.WebAuth({
     clientID: AUTH_CONFIG.CLIENT_ID,
     domain: AUTH_CONFIG.CLIENT_DOMAIN,
-    responseType: 'token',
+    responseType: 'id_token token',
     redirectUri: AUTH_CONFIG.REDIRECT,
     audience: AUTH_CONFIG.AUDIENCE,
     scope: AUTH_CONFIG.SCOPE
@@ -25,11 +25,11 @@ export class AuthService {
   loggedIn: boolean;
   loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
 
-  constructor() {
-    // You can restore an unexpired authentication session on init
-    // by using the checkSession() endpoint from auth0.js:
-    // https://auth0.com/docs/libraries/auth0js/v9#using-checksession-to-acquire-new-tokens
-  }
+  // NOTE: You can restore an unexpired authentication session on init
+  // by using the checkSession() endpoint from auth0.js:
+  // https://auth0.com/docs/libraries/auth0js/v9#using-checksession-to-acquire-new-tokens
+
+  constructor() {}
 
   private _setLoggedIn(value: boolean) {
     // Update login status subject
@@ -47,25 +47,18 @@ export class AuthService {
     this._Auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken) {
         window.location.hash = '';
-        this.getUserInfo(authResult);
+        this._setSession(authResult);
       } else if (err) {
         console.error(`Error: ${err.error}`);
       }
     });
   }
 
-  getUserInfo(authResult) {
-    // Use access token to retrieve user's profile and set session
-    this._Auth0.client.userInfo(authResult.accessToken, (err, profile) => {
-      this._setSession(authResult, profile);
-    });
-  }
-
-  private _setSession(authResult, profile) {
+  private _setSession(authResult) {
     // Save session data and update login status subject
     this.expiresAt = authResult.expiresIn * 1000 + Date.now();
     this.accessToken = authResult.accessToken;
-    this.userProfile = profile;
+    this.userProfile = authResult.idTokenPayload;
     this._setLoggedIn(true);
   }
 
