@@ -1,18 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from './../auth/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent implements OnInit {
-  profileArray = this._makeProfileArray(this.auth.userProfile);
+export class ProfileComponent implements OnInit, OnDestroy {
+  user: any;
+  profileArray: any[];
+  profileSub: Subscription;
 
-  constructor(public auth: AuthService) { }
+  constructor(private auth: AuthService) { }
 
   ngOnInit() {
-    console.log(this.auth.userProfile);
+    this.profileSub = this.auth.userProfile$.subscribe(
+      profile => {
+        this.user = profile;
+        this.profileArray = this._makeProfileArray(profile);
+      },
+      err => console.log(err)
+    );
   }
 
   private _makeProfileArray(obj) {
@@ -25,6 +34,10 @@ export class ProfileComponent implements OnInit {
     }
 
     return keyPropArray;
+  }
+
+  ngOnDestroy() {
+    this.profileSub.unsubscribe();
   }
 
 }

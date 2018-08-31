@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import * as auth0 from 'auth0-js';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { TokenData } from './tokendata.model';
 
 @Injectable()
 export class AuthService {
@@ -17,9 +18,10 @@ export class AuthService {
     audience: environment.auth.AUDIENCE,
     scope: 'openid profile email'
   });
+  // Track locally whether or not to renew token
   private _loggedInKey = 'isLoggedIn';
-  // Store authentication data
-  tokenData$ = new BehaviorSubject(null);
+  // Create streams for authentication data
+  tokenData$ = new BehaviorSubject(new TokenData(null, null));
   userProfile$ = new BehaviorSubject(null);
   // Authentication navigation
   onAuthSuccessUrl = '/';
@@ -54,31 +56,43 @@ export class AuthService {
   constructor(private router: Router) {}
 
   login() {
-    // Auth0 authorize request
     this._Auth0.authorize();
   }
 
   handleLoginCallback() {
     if (window.location.hash && !this.authenticated) {
-      this.parseHash$.subscribe({
-        next: authResult => {
-          this._setSession(authResult);
+      this.parseHash$.subscribe(
+        authResult => {
+          this._streamSession(authResult);
           window.location.hash = '';
           this.router.navigate([this.onAuthSuccessUrl]);
         },
-        error: err => console.log(err)
-      })
+        err => this._handleError(err)
+      )
     }
   }
 
-  private _setSession(authResult) {
-    // Save session data and emit values for observables
-    localStorage.setItem(this._loggedInKey, JSON.stringify(true));
+  private _streamSession(authResult) {
+    // Emit values for auth observables
     this.tokenData$.next({
       expiresAt: authResult.expiresIn * 1000 + Date.now(),
       accessToken: authResult.accessToken
     });
     this.userProfile$.next(authResult.idTokenPayload);
+    // Set key stating app is logged in
+    localStorage.setItem(this._loggedInKey, JSON.stringify(true));
+  }
+
+  renewAuth() {
+    if (this.authenticated) {
+      this.checkSession$.subscribe(
+        authResult => this._streamSession(authResult),
+        err => {
+          localStorage.removeItem(this._loggedInKey);
+          this.router.navigate([this.onAuthFailureUrl]);
+        }
+      );
+    }
   }
 
   logout() {
@@ -93,9 +107,15 @@ export class AuthService {
   }
 
   get authenticated(): boolean {
-    // Check if current date is greater than
-    // expiration and user is currently logged in
     return JSON.parse(localStorage.getItem(this._loggedInKey));
+  }
+
+  private _handleError(err) {
+    if (err.error_description) {
+      console.error(`Error: ${err.error_description}`);
+    } else {
+      console.error(`Error: ${JSON.stringify(err)}`);
+    }
   }
 
 }

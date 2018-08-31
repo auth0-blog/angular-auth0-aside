@@ -1,6 +1,6 @@
-<h1>{{auth.userProfile.name}}</h1>
+<h1>{{user?.name}}</h1>
 
-<ul>
+<ul *ngIf="profileArray">
   <li *ngFor="let profileProp of profileArray">
     <code>{{profileProp}}</code>
   </li>

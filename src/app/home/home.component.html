@@ -4,8 +4,8 @@
   <button (click)="auth.login()">Log In</button>
 </div>
 
-<div *ngIf="auth.authenticated">
-  <p>Hello, <a routerLink="/profile" href>{{auth.userProfile?.name}}</a>!</p>
+<div *ngIf="auth.authenticated && user">
+  <p>Hello, <a routerLink="/profile" href>{{user.name}}</a>!</p>
   <button (click)="auth.logout()">Log Out</button>
 
   <div *ngIf="dragonsExist">
