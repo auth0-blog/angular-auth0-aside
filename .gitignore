@@ -2,7 +2,7 @@
 
 /node_modules
 /server/node_modules
-auth0-variables.ts
+environment.ts
 config.js
 
 # compiled output
