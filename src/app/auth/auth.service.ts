@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as auth0 from 'auth0-js';
-import { environment } from '../../environments/environment';
+import { environment } from './../../environments/environment';
 import { Router } from '@angular/router';
 import { TokenData } from './tokendata.model';
 
