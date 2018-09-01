@@ -18,17 +18,17 @@ export class AuthService {
     audience: environment.auth.AUDIENCE,
     scope: 'openid profile email'
   });
-  // Track locally whether or not to renew token
-  private authFlag = 'isLoggedIn';
+  // Track whether or not to renew token
+  private _authFlag = 'isLoggedIn';
   // Create streams for authentication data
-  tokenData$ = new BehaviorSubject(new TokenData(null, null));
+  tokenData$ = new BehaviorSubject(new TokenData());
   userProfile$ = new BehaviorSubject(null);
   // Authentication navigation
   onAuthSuccessUrl = '/';
   onAuthFailureUrl = '/';
   logoutUrl = environment.auth.LOGOUT_URL;
 
-  // Create observable of parseHash method to gather auth results
+  // Create observable of Auth0 parseHash method to gather auth results
   parseHash$ = Observable.create(observer => {
     this._Auth0.parseHash((err, authResult) => {
       if (err) {
@@ -40,8 +40,8 @@ export class AuthService {
     });
   });
 
-  // Create observable of checkSession method to verify
-  // authorization server session and renew tokens
+  // Create observable of Auth0 checkSession method to
+  // verify authorization server session and renew tokens
   checkSession$ = Observable.create(observer => {
     this._Auth0.checkSession({}, (err, authResult) => {
       if (err) {
@@ -80,7 +80,7 @@ export class AuthService {
     });
     this.userProfile$.next(authResult.idTokenPayload);
     // Set flag in local storage stating this app is logged in
-    localStorage.setItem(this.authFlag, JSON.stringify(true));
+    localStorage.setItem(this._authFlag, JSON.stringify(true));
   }
 
   renewAuth() {
@@ -88,7 +88,7 @@ export class AuthService {
       this.checkSession$.subscribe(
         authResult => this._streamSession(authResult),
         err => {
-          localStorage.removeItem(this.authFlag);
+          localStorage.removeItem(this._authFlag);
           this.router.navigate([this.onAuthFailureUrl]);
         }
       );
@@ -97,7 +97,7 @@ export class AuthService {
 
   logout() {
     // Set authentication status flag in local storage to false
-    localStorage.setItem(this.authFlag, JSON.stringify(false));
+    localStorage.setItem(this._authFlag, JSON.stringify(false));
     // This does a refresh and redirects back to homepage
     // Make sure you have the logout URL in your Auth0
     // Dashboard Application settings in Allowed Logout URLs
@@ -108,7 +108,7 @@ export class AuthService {
   }
 
   get authenticated(): boolean {
-    return JSON.parse(localStorage.getItem(this.authFlag));
+    return JSON.parse(localStorage.getItem(this._authFlag));
   }
 
   private _handleError(err) {
