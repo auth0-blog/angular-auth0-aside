@@ -53,7 +53,7 @@ export class AuthService {
     });
   });
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   login() {
     this._Auth0.authorize();

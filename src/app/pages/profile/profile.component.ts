@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AuthService } from './../auth/auth.service';
+import { AuthService } from './../../auth/auth.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -29,10 +29,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
-        keyPropArray.push(key + ': ' + obj[key]);
+        keyPropArray.push(key + ': ' + JSON.stringify(obj[key]));
       }
     }
-
     return keyPropArray;
   }
 

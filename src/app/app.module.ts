@@ -6,9 +6,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { ApiService } from './api.service';
 import { AuthService } from './auth/auth.service';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
-import { CallbackComponent } from './callback/callback.component';
-import { ProfileComponent } from './profile/profile.component';
+import { HomeComponent } from './pages/home/home.component';
+import { CallbackComponent } from './pages/callback.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 @NgModule({
   declarations: [
