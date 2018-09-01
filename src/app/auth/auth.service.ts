@@ -8,8 +8,8 @@ import { TokenData } from './tokendata.model';
 @Injectable()
 export class AuthService {
   // Create Auth0 web auth instance
-  // @TODO: Update environment variables and remove .example extension in
-  // src/environments/environment.ts.example
+  // @TODO: Update environment variables and remove .example
+  //  extension in src/environments/environment.ts.example
   private _Auth0 = new auth0.WebAuth({
     clientID: environment.auth.CLIENT_ID,
     domain: environment.auth.CLIENT_DOMAIN,
@@ -63,7 +63,7 @@ export class AuthService {
     if (window.location.hash && !this.authenticated) {
       this.parseHash$.subscribe(
         authResult => {
-          this._streamSession(authResult);
+          this._setSession(authResult);
           window.location.hash = '';
           this.router.navigate([this.onAuthSuccessUrl]);
         },
@@ -72,7 +72,7 @@ export class AuthService {
     }
   }
 
-  private _streamSession(authResult) {
+  private _setSession(authResult) {
     // Emit values for auth observables
     this.tokenData$.next({
       expiresAt: authResult.expiresIn * 1000 + Date.now(),
@@ -83,10 +83,14 @@ export class AuthService {
     localStorage.setItem(this._authFlag, JSON.stringify(true));
   }
 
+  get authenticated(): boolean {
+    return JSON.parse(localStorage.getItem(this._authFlag));
+  }
+
   renewAuth() {
     if (this.authenticated) {
       this.checkSession$.subscribe(
-        authResult => this._streamSession(authResult),
+        authResult => this._setSession(authResult),
         err => {
           localStorage.removeItem(this._authFlag);
           this.router.navigate([this.onAuthFailureUrl]);
@@ -105,10 +109,6 @@ export class AuthService {
       returnTo: this.logoutUrl,
       clientID: environment.auth.CLIENT_ID
     });
-  }
-
-  get authenticated(): boolean {
-    return JSON.parse(localStorage.getItem(this._authFlag));
   }
 
   private _handleError(err) {
