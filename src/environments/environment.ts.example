@@ -6,8 +6,8 @@
 export const environment = {
   production: false,
   auth: {
-    CLIENT_ID: 'YOUR_CLIENT_ID',
-    CLIENT_DOMAIN: 'YOUR_DOMAIN', // e.g., 'you.auth0.com'
+    CLIENT_ID: '[YOUR_CLIENT_ID]',
+    CLIENT_DOMAIN: '[YOUR_AUTH0_DOMAIN]', // e.g., 'you.auth0.com'
     AUDIENCE: 'http://localhost:3001/api/',
     REDIRECT: 'http://localhost:4200/callback',
     LOGOUT_URL: 'http://localhost:4200'

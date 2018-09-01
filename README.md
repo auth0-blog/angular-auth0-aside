@@ -21,14 +21,18 @@ $ cd server
 $ npm install
 ```
 
-1. Open `server/config.js.example` and remove `.example` from the file name. Then replace `[CLIENT_DOMAIN]` with your Auth0 domain.
-2. Open `src/app/auth/auth0-variables.ts.example` and remove `.example` from the file name. Then replace `[CLIENT_ID]` and `[CLIENT_DOMAIN]` with your Auth0 client ID and domain.
+1. Open `server/config.js.example` and remove `.example` from the file name. Then replace `[YOUR_AUTH0_DOMAIN]` with your Auth0 domain.
+2. Open `src/app/environments/environment.example` and remove `.example` from the file name. Then replace `[YOUR_CLIENT_ID]` and `[YOUR_AUTH0_DOMAIN]` with your Auth0 application's client ID and domain.
 
 ## Serving the project
+
+From the root of this project, run:
 
 ```bash
 $ npm start
 ```
+
+This will concurrently serve the Angular and API servers.
 
 ## What is Auth0?
 
