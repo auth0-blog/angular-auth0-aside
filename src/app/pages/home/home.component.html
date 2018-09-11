@@ -4,11 +4,11 @@
   <button (click)="auth.login()">Log In</button>
 </div>
 
-<div *ngIf="auth.authenticated && user">
+<div *ngIf="auth.authenticated && (user$ | async) as user">
   <p>Hello, <a routerLink="/profile" href>{{user.name}}</a>!</p>
   <button (click)="auth.logout()">Log Out</button>
 
-  <div *ngIf="dragonsExist">
+  <div *ngIf="(dragons$ | async) as dragons">
     <h2>Here Be Dragons</h2>
 
     <ul>

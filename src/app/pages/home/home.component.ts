@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { ApiService } from './../../api.service';
 import { AuthService } from './../../auth/auth.service';
 
@@ -8,11 +9,9 @@ import { AuthService } from './../../auth/auth.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit, OnDestroy {
-  dragons: any[];
-  profileSub: Subscription;
-  dragonsSub: Subscription;
-  user: any;
+export class HomeComponent implements OnInit {
+  dragons$ = this.api.getDragons$().pipe(catchError(err => throwError(err)));
+  user$ = this.auth.userProfile$.pipe(catchError(err => throwError(err)));
 
   constructor(
     private api: ApiService,
@@ -20,31 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this._getDragons();
-    // Subscribe to userProfile$ subject
-    this.profileSub = this.auth.userProfile$.subscribe(
-      profile => this.user = profile ? profile : null,
-      err => console.log(err)
-    );
-  }
-
-  private _getDragons() {
-    // Subscribe to dragons API observable
-    this.dragonsSub = this.api.getDragons$().subscribe(
-      data => {
-        this.dragons = data;
-      },
-      err => console.log(err)
-    );
-  }
-
-  get dragonsExist() {
-    return !!this.dragons && this.dragons.length;
-  }
-
-  ngOnDestroy() {
-    this.profileSub.unsubscribe();
-    this.dragonsSub.unsubscribe();
+    console.log('home ngOnInit');
   }
 
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
-import { publishLast, mergeMap } from 'rxjs/operators';
+import { mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
@@ -16,13 +16,12 @@ export class InterceptorService implements HttpInterceptor {
     // and do not need Authorization header, implement logic
     // here to accommodate that and conditionally let public
     // requests pass through based on your requirements
-    return this.auth.tokenData$
+    return this.auth.token$
       .pipe(
-        mergeMap(tokenData => {
-          console.log('hi', tokenData);
-          if (tokenData && tokenData.accessToken) {
+        mergeMap(token => {
+          if (token) {
             const tokenReq = req.clone({
-              setHeaders: { Authorization: `Bearer ${tokenData.accessToken}` }
+              setHeaders: { Authorization: `Bearer ${token}` }
             });
             return next.handle(tokenReq);
           }

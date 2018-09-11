@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AsyncSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import * as auth0 from 'auth0-js';
 import { environment } from './../../environments/environment';
 import { Router } from '@angular/router';
@@ -21,8 +21,8 @@ export class AuthService {
   // Track whether or not to renew token
   private _authFlag = 'isLoggedIn';
   // Create streams for authentication data
-  tokenData$ = new AsyncSubject<TokenData>();
-  userProfile$ = new AsyncSubject<any>();
+  tokenData$ = new BehaviorSubject<TokenData>(new TokenData(null, null));
+  userProfile$ = new BehaviorSubject<any>(null);
   // Authentication navigation
   onAuthSuccessUrl = '/';
   onAuthFailureUrl = '/';
@@ -53,6 +53,24 @@ export class AuthService {
     });
   });
 
+  // Create observable of token
+  // This is important for the token interceptor
+  // which should receive a non-null initial value
+  // once the appropriate value is available
+  token$ = Observable.create(observer => {
+    this.tokenData$.subscribe(
+      tokenData => {
+        if (tokenData.accessToken) {
+          observer.next(tokenData.accessToken);
+        }
+      },
+      err => {
+        observer.error(err);
+        observer.complete();
+      }
+    )
+});
+
   constructor(private router: Router) { }
 
   login() {
@@ -73,15 +91,13 @@ export class AuthService {
   }
 
   private _setAuth(authResult) {
-    // Emit value for tokenData$ async subject and complete
+    // Emit value for tokenData$ subject
     this.tokenData$.next({
       expiresAt: authResult.expiresIn * 1000 + Date.now(),
       accessToken: authResult.accessToken
     });
-    this.tokenData$.complete();
-    // Emit value for userProfile$ async subject and complete
+    // Emit value for userProfile$ subject
     this.userProfile$.next(authResult.idTokenPayload);
-    this.userProfile$.complete();
     // Set flag in local storage stating this app is logged in
     localStorage.setItem(this._authFlag, JSON.stringify(true));
   }

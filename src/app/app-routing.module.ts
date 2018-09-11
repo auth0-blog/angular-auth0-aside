@@ -12,10 +12,6 @@ import { ProfileComponent } from './pages/profile/profile.component';
   imports: [
     RouterModule.forRoot([
       {
-        path: '',
-        component: HomeComponent
-      },
-      {
         path: 'callback',
         component: CallbackComponent
       },
@@ -27,8 +23,8 @@ import { ProfileComponent } from './pages/profile/profile.component';
         ]
       },
       {
-        path: '**',
-        redirectTo: '',
+        path: '',
+        component: HomeComponent,
         pathMatch: 'full'
       }
     ])
