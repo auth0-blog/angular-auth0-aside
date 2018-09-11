@@ -10,7 +10,6 @@ import { AuthService } from './../../auth/auth.service';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   dragons: any[];
-  authSub: Subscription;
   profileSub: Subscription;
   dragonsSub: Subscription;
   user: any;
@@ -21,18 +20,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    // Subscribe to tokenData$ subject
-    this.authSub = this.auth.tokenData$.subscribe(
-      tokenData => {
-        if (tokenData.accessToken) {
-          // If authenticated, get dragon data
-          this._getDragons(tokenData.accessToken);
-        } else {
-          this.dragons = null;
-        }
-      },
-      err => console.log(err)
-    );
+    this._getDragons();
     // Subscribe to userProfile$ subject
     this.profileSub = this.auth.userProfile$.subscribe(
       profile => this.user = profile ? profile : null,
@@ -40,9 +28,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _getDragons(accessToken: string) {
+  private _getDragons() {
     // Subscribe to dragons API observable
-    this.dragonsSub = this.api.getDragons$(accessToken).subscribe(
+    this.dragonsSub = this.api.getDragons$().subscribe(
       data => {
         this.dragons = data;
       },
@@ -50,22 +38,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _destroyDragonsSub() {
-    // If a dragons subscription exists, unsubscribe
-    if (this.dragonsSub) {
-      this.dragonsSub.unsubscribe();
-    }
-  }
-
   get dragonsExist() {
     return !!this.dragons && this.dragons.length;
   }
 
   ngOnDestroy() {
-    // Unsubscribe from observables
-    this.authSub.unsubscribe();
     this.profileSub.unsubscribe();
-    this._destroyDragonsSub();
+    this.dragonsSub.unsubscribe();
   }
 
 }

@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { InterceptorService } from './auth/token.interceptor';
 
 import { HomeComponent } from './pages/home/home.component';
 import { CallbackComponent } from './pages/callback.component';
@@ -32,7 +34,12 @@ import { ProfileComponent } from './pages/profile/profile.component';
     ])
   ],
   providers: [
-    AuthGuard
+    AuthGuard,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: InterceptorService,
+      multi: true
+    }
   ],
   exports: [
     RouterModule

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { AsyncSubject, Observable } from 'rxjs';
 import * as auth0 from 'auth0-js';
 import { environment } from './../../environments/environment';
 import { Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { TokenData } from './tokendata.model';
 export class AuthService {
   // Create Auth0 web auth instance
   // @TODO: Update environment variables and remove .example
-  //  extension in src/environments/environment.ts.example
+  // extension in src/environments/environment.ts.example
   private _Auth0 = new auth0.WebAuth({
     clientID: environment.auth.CLIENT_ID,
     domain: environment.auth.CLIENT_DOMAIN,
@@ -21,8 +21,8 @@ export class AuthService {
   // Track whether or not to renew token
   private _authFlag = 'isLoggedIn';
   // Create streams for authentication data
-  tokenData$ = new BehaviorSubject(new TokenData());
-  userProfile$ = new BehaviorSubject(null);
+  tokenData$ = new AsyncSubject<TokenData>();
+  userProfile$ = new AsyncSubject<any>();
   // Authentication navigation
   onAuthSuccessUrl = '/';
   onAuthFailureUrl = '/';
@@ -73,12 +73,15 @@ export class AuthService {
   }
 
   private _setAuth(authResult) {
-    // Emit values for auth observables
+    // Emit value for tokenData$ async subject and complete
     this.tokenData$.next({
       expiresAt: authResult.expiresIn * 1000 + Date.now(),
       accessToken: authResult.accessToken
     });
+    this.tokenData$.complete();
+    // Emit value for userProfile$ async subject and complete
     this.userProfile$.next(authResult.idTokenPayload);
+    this.userProfile$.complete();
     // Set flag in local storage stating this app is logged in
     localStorage.setItem(this._authFlag, JSON.stringify(true));
   }
