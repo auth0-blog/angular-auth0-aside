@@ -3,11 +3,10 @@ import { throwError, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth/auth.service';
+import { environment } from './../environments/environment';
 
 @Injectable()
 export class ApiService {
-  private baseUrl = 'http://localhost:3001/api/';
-
   constructor(
     private http: HttpClient,
     private auth: AuthService
@@ -15,7 +14,7 @@ export class ApiService {
 
   getDragons$(accessToken: string): Observable<any[]> {
     return this.http
-      .get<any[]>(`${this.baseUrl}dragons`, {
+      .get<any[]>(`${environment.auth.AUDIENCE}dragons`, {
         headers: new HttpHeaders().set(
           'Authorization', `Bearer ${accessToken}`
         )
