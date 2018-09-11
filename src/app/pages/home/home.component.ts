@@ -10,7 +10,7 @@ import { AuthService } from './../../auth/auth.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  dragons$ = this.api.getDragons$().pipe(catchError(err => throwError(err)));
+  dragons$ = this.api.getDragons$();
   user$ = this.auth.userProfile$.pipe(catchError(err => throwError(err)));
 
   constructor(
@@ -19,7 +19,6 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('home ngOnInit');
   }
 
 }
