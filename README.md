@@ -34,6 +34,18 @@ $ npm start
 
 This will concurrently serve the Angular and API servers.
 
+### Running on Docker
+
+After running the following commands, the app will be available at [`http://localhost:4200`](http://localhost:4200).
+
+```bash
+# build the image
+docker build -t angular-auth0 .
+
+# run an instance based on this image
+docker run --name angular-auth0 -d -p 4200:80 angular-auth0
+```
+
 ## What is Auth0?
 
 Auth0 helps you to:
