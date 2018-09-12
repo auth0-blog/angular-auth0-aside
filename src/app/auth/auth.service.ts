@@ -21,7 +21,7 @@ export class AuthService {
   // Track whether or not to renew token
   private _authFlag = 'isLoggedIn';
   // Create streams for authentication data
-  tokenData$ = new BehaviorSubject<TokenData>(new TokenData(null, null));
+  tokenData$ = new BehaviorSubject<TokenData>(new TokenData());
   userProfile$ = new BehaviorSubject<any>(null);
   // Authentication navigation
   onAuthSuccessUrl = '/';
