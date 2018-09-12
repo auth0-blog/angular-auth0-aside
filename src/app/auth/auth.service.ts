@@ -51,7 +51,7 @@ export class AuthService {
         observer.complete();
       }
     )
-});
+  });
 
   constructor(private router: Router) { }
 
