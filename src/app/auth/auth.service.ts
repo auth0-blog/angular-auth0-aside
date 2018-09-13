@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, bindNodeCallback } from 'rxjs';
+import { BehaviorSubject, Observable, bindNodeCallback, of } from 'rxjs';
 import * as auth0 from 'auth0-js';
 import { environment } from './../../environments/environment';
 import { Router } from '@angular/router';
@@ -35,23 +35,11 @@ export class AuthService {
   // verify authorization server session and renew tokens
   checkSession$ = bindNodeCallback(this._Auth0.checkSession.bind(this._Auth0));
 
-  // Create observable of token
+  // Observable of token
   // This is important for the token interceptor
-  // which should receive a non-null initial value
-  // once the appropriate value is available
-  token$ = Observable.create(observer => {
-    this.tokenData$.subscribe(
-      tokenData => {
-        if (tokenData.accessToken) {
-          observer.next(tokenData.accessToken);
-        }
-      },
-      err => {
-        observer.error(err);
-        observer.complete();
-      }
-    )
-  });
+  // which should receive a defined initial value;
+  // Declared when authResult becomes available
+  token$: Observable<string>;
 
   constructor(private router: Router) { }
 
@@ -73,7 +61,9 @@ export class AuthService {
   }
 
   private _setAuth(authResult) {
-    // Emit value for tokenData$ subject
+    // Declare observable of valid token
+    this.token$ = of(authResult.accessToken);
+    // Emit values for auth data subjects
     this.tokenData$.next({
       expiresAt: authResult.expiresIn * 1000 + Date.now(),
       accessToken: authResult.accessToken
