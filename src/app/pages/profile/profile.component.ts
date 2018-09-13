@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from './../../auth/auth.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -8,9 +7,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  user$: Observable<any> = this.auth.userProfile$;
-
-  constructor(private auth: AuthService) { }
+  constructor(public auth: AuthService) { }
 
   ngOnInit() {
   }
