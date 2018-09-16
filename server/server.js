@@ -16,15 +16,15 @@ const config = require('./config.js');
 // and update with your proper Auth0 information
 
 const jwtCheck = jwt({
-    secret: jwks.expressJwtSecret({
-      cache: true,
-      rateLimit: true,
-      jwksRequestsPerMinute: 5,
-      jwksUri: `https://${config.CLIENT_DOMAIN}/.well-known/jwks.json`
-    }),
-    audience: config.AUTH0_AUDIENCE,
-    issuer: `https://${config.CLIENT_DOMAIN}/`,
-    algorithm: 'RS256'
+  secret: jwks.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://${config.CLIENT_DOMAIN}/.well-known/jwks.json`
+  }),
+  audience: config.AUTH0_AUDIENCE,
+  issuer: `https://${config.CLIENT_DOMAIN}/`,
+  algorithm: 'RS256'
 });
 
 //--- Set up app
