@@ -7,6 +7,23 @@ This repository demonstrates the use of [Auth0](https://auth0.com) with [Angular
 * [Node.js with npm](http://nodejs.org), Node >= 6.9.0, npm >= 3
 * [@angular/cli](https://github.com/angular/angular-cli), >= 6
 
+## Auth0 Application Setup
+
+1. Go to your [**Auth0 Dashboard: Applications**](https://manage.auth0.com/#/applications) section and click the "[+ Create Application](https://manage.auth0.com/#/applications/create)" button.
+2. Name your new app and select "Single Page Web Applications".
+3. In the **Settings** for your new Auth0 app, add `http://localhost:4200/callback` to the **Allowed Callback URLs**.
+4. Add `http://localhost:4200` to both the **Allowed Web Origins** and **Allowed Logout URLs**. Click the "Save Changes" button.
+5. If you'd like, you can [set up some social connections](https://manage.auth0.com/#/connections/social). You can then enable them for your app in the **Application** options under the **Connections** tab. The example shown in the screenshot above uses username/password database, Facebook, Google, and Twitter.
+
+> **Note:** Set up your own social keys and _do not_ leave social connections set to use Auth0 dev keys or you will encounter issues with token renewal.
+
+## Auth0 API Setup
+
+1. Go to [**APIs**](https://manage.auth0.com/#/apis) in your Auth0 dashboard and click on the "Create API" button. Enter a name for the API. Set the **Identifier** to your API endpoint URL. In this example, this is `http://localhost:3001/api/`. The **Signing Algorithm** should be `RS256`.
+2. You can consult the Node.js example under the **Quick Start** tab in your new API's settings. We'll implement our Node API in this fashion, using [Express](https://expressjs.com/), [express-jwt](https://github.com/auth0/express-jwt), and [jwks-rsa](https://github.com/auth0/node-jwks-rsa).
+
+We're now ready to implement Auth0 authentication on both our Angular client and Node backend API.
+
 ## Installation
 
 Clone this project. From the root directory, run the following commands to install dependencies for the server and client-side:
