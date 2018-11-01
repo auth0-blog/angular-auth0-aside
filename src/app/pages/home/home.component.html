@@ -1,19 +1,18 @@
 <h1>Angular with Auth0</h1>
 
-<div *ngIf="!auth.authenticated">
+<div *ngIf="!auth.isAuthenticated">
   <button (click)="auth.login()">Log In</button>
 </div>
 
-<div *ngIf="auth.authenticated && (user$ | async) as user">
-  <p>Hello, <a routerLink="/profile" href>{{user.name}}</a>!</p>
+<div *ngIf="auth.isAuthenticated && (user$ | async) as user">
+  <p>Hello, <a routerLink="/profile" href>{{ user.name }}</a>!</p>
   <button (click)="auth.logout()">Log Out</button>
 
   <div *ngIf="(dragons$ | async) as dragons">
     <h2>Here Be Dragons</h2>
-
     <ul>
       <li *ngFor="let dragon of dragons">
-        {{dragon.name}} - {{dragon.source}}
+        {{ dragon.name }} - {{ dragon.source }}
       </li>
     </ul>
   </div>

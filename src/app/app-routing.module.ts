@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { InterceptorService } from './auth/token.interceptor';
+import { InterceptorService } from './auth/secure.interceptor';
 
 import { HomeComponent } from './pages/home/home.component';
 import { CallbackComponent } from './pages/callback.component';

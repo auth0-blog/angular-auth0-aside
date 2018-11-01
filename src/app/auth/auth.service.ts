@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, bindNodeCallback, of } from 'rxjs';
+import { BehaviorSubject, bindNodeCallback } from 'rxjs';
 import * as auth0 from 'auth0-js';
 import { environment } from './../../environments/environment';
 import { Router } from '@angular/router';
@@ -40,11 +40,10 @@ export class AuthService {
   }
 
   handleLoginCallback() {
-    if (window.location.hash && !this.authenticated) {
+    if (window.location.hash && !this.isAuthenticated) {
       this.parseHash$().subscribe(
         authResult => {
-          this._setAuth(authResult);
-          window.location.hash = '';
+          this.localLogin(authResult);
           this.router.navigate([this.onAuthSuccessUrl]);
         },
         err => this.handleError(err)
@@ -52,7 +51,7 @@ export class AuthService {
     }
   }
 
-  private _setAuth(authResult) {
+  private localLogin(authResult) {
     // Observable of token
     this.token$.next(authResult.accessToken);
     // Emit value for user data subject
@@ -61,14 +60,14 @@ export class AuthService {
     localStorage.setItem(this.authFlag, JSON.stringify(true));
   }
 
-  get authenticated(): boolean {
+  get isAuthenticated(): boolean {
     return JSON.parse(localStorage.getItem(this.authFlag));
   }
 
   renewAuth() {
-    if (this.authenticated) {
+    if (this.isAuthenticated) {
       this.checkSession$({}).subscribe(
-        authResult => this._setAuth(authResult),
+        authResult => this.localLogin(authResult),
         err => {
           localStorage.removeItem(this.authFlag);
           this.router.navigate([this.onAuthFailureUrl]);

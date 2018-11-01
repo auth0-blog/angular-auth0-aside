@@ -1,12 +1,10 @@
 <div *ngIf="(auth.userProfile$ | async) as user">
-  <h1>{{user.name}}</h1>
-
+  <h1>{{ user.name }}</h1>
   <ul>
     <li *ngFor="let profileProp of makeProfileArray(user)">
-      <code>{{profileProp}}</code>
+      <code>{{ profileProp }}</code>
     </li>
   </ul>
-
   <p>
     <a routerLink="/" href>Back to Home</a>
   </p>

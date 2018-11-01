@@ -6,6 +6,7 @@ import { filter, mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
+
   constructor(private auth: AuthService) { }
 
   intercept(
