@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { filter, mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
@@ -18,6 +18,7 @@ export class InterceptorService implements HttpInterceptor {
     // requests pass through based on your requirements
     return this.auth.token$
       .pipe(
+        filter(token => typeof token === 'string'),
         mergeMap(token => {
           if (token) {
             const tokenReq = req.clone({

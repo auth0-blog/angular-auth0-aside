@@ -9,7 +9,7 @@ export class AuthService {
   // Create Auth0 web auth instance
   // @TODO: Update environment variables and remove .example
   // extension in src/environments/environment.ts.example
-  private _Auth0 = new auth0.WebAuth({
+  private Auth0 = new auth0.WebAuth({
     clientID: environment.auth.CLIENT_ID,
     domain: environment.auth.CLIENT_DOMAIN,
     responseType: 'id_token token',
@@ -18,9 +18,9 @@ export class AuthService {
     scope: 'openid profile email'
   });
   // Track whether or not to renew token
-  private _authFlag = 'isLoggedIn';
+  private authFlag = 'isLoggedIn';
   // Create stream for token
-  token$: Observable<string>;
+  token$ = new BehaviorSubject<string>(null);
   // Create stream for user profile data
   userProfile$ = new BehaviorSubject<any>(null);
   // Authentication navigation
@@ -28,15 +28,15 @@ export class AuthService {
   onAuthFailureUrl = '/';
   logoutUrl = environment.auth.LOGOUT_URL;
   // Create observable of Auth0 parseHash method to gather auth results
-  parseHash$ = bindNodeCallback(this._Auth0.parseHash.bind(this._Auth0));
+  parseHash$ = bindNodeCallback(this.Auth0.parseHash.bind(this.Auth0));
   // Create observable of Auth0 checkSession method to
   // verify authorization server session and renew tokens
-  checkSession$ = bindNodeCallback(this._Auth0.checkSession.bind(this._Auth0));
+  checkSession$ = bindNodeCallback(this.Auth0.checkSession.bind(this.Auth0));
 
   constructor(private router: Router) { }
 
   login() {
-    this._Auth0.authorize();
+    this.Auth0.authorize();
   }
 
   handleLoginCallback() {
@@ -47,22 +47,22 @@ export class AuthService {
           window.location.hash = '';
           this.router.navigate([this.onAuthSuccessUrl]);
         },
-        err => this._handleError(err)
+        err => this.handleError(err)
       )
     }
   }
 
   private _setAuth(authResult) {
     // Observable of token
-    this.token$ = of(authResult.accessToken);
+    this.token$.next(authResult.accessToken);
     // Emit value for user data subject
     this.userProfile$.next(authResult.idTokenPayload);
     // Set flag in local storage stating this app is logged in
-    localStorage.setItem(this._authFlag, JSON.stringify(true));
+    localStorage.setItem(this.authFlag, JSON.stringify(true));
   }
 
   get authenticated(): boolean {
-    return JSON.parse(localStorage.getItem(this._authFlag));
+    return JSON.parse(localStorage.getItem(this.authFlag));
   }
 
   renewAuth() {
@@ -70,26 +70,31 @@ export class AuthService {
       this.checkSession$({}).subscribe(
         authResult => this._setAuth(authResult),
         err => {
-          localStorage.removeItem(this._authFlag);
+          localStorage.removeItem(this.authFlag);
           this.router.navigate([this.onAuthFailureUrl]);
         }
       );
     }
   }
 
+  private localLogout() {
+    localStorage.setItem(this.authFlag, JSON.stringify(false));
+    this.token$.next(null);
+    this.userProfile$.next(null);
+  }
+
   logout() {
-    // Set authentication status flag in local storage to false
-    localStorage.setItem(this._authFlag, JSON.stringify(false));
+    this.localLogout();
     // This does a refresh and redirects back to homepage
     // Make sure you have the logout URL in your Auth0
     // Dashboard Application settings in Allowed Logout URLs
-    this._Auth0.logout({
+    this.Auth0.logout({
       returnTo: this.logoutUrl,
       clientID: environment.auth.CLIENT_ID
     });
   }
 
-  private _handleError(err) {
+  private handleError(err) {
     if (err.error_description) {
       console.error(`Error: ${err.error_description}`);
     } else {
