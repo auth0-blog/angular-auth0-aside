@@ -21,12 +21,10 @@ export class InterceptorService implements HttpInterceptor {
       .pipe(
         filter(token => typeof token === 'string'),
         mergeMap(token => {
-          if (token) {
-            const tokenReq = req.clone({
-              setHeaders: { Authorization: `Bearer ${token}` }
-            });
-            return next.handle(tokenReq);
-          }
+          const tokenReq = req.clone({
+            setHeaders: { Authorization: `Bearer ${token}` }
+          });
+          return next.handle(tokenReq);
         })
       );
   }
