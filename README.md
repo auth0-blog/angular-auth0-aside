@@ -4,8 +4,8 @@ This repository demonstrates the use of [Auth0](https://auth0.com) with [Angular
 
 ## Dependencies
 
-* [Node.js with npm](http://nodejs.org), Node >= 6.9.0, npm >= 3
-* [@angular/cli](https://github.com/angular/angular-cli), >= 6
+* [Node.js with npm](http://nodejs.org), Node >= 8, npm >= 5
+* [@angular/cli](https://github.com/angular/angular-cli), >= 8
 
 ## Auth0 Application Setup
 
